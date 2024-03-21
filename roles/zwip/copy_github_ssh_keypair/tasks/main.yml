@@ -1,0 +1,11 @@
+---
+- name: Your copy task
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+    - { src: "~/.ssh/github-server/id_ed25519", dest: "~/.ssh/id_ed25519" }
+    - {
+      src: "~/.ssh/github-server/id_ed25519.pub",
+      dest: "~/.ssh/id_ed25519.pub",
+    }

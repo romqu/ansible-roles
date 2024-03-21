@@ -1,0 +1,45 @@
+#!/bin/bash
+set -o nounset
+set -o pipefail
+
+declare -r repo_list=(
+{% for dict_item in restic__docker_setup__repo_dict %}
+      "{{ dict_item["repo"] }}"
+{% endfor -%}
+)
+
+init_repo() {
+    local repo
+    local init_result
+    repo=$1
+    init_result=$(restic -r "${repo}" init 2>&1)
+    echo "$init_result"
+}
+
+string_contain() { case $2 in *$1*) return 0 ;; *) return 1 ;; esac }
+
+does_repo_already_exists() {
+    string_contain "exists" "$1"
+    return $?
+}
+
+process_result() {
+    local does_exist
+    does_exist=$1
+
+    if [ "$does_exist" -eq 0 ]; then
+        restic restore latest --target .
+    fi
+}
+
+init_all_repos() {
+    for repo in "${repo_list[@]}"; do
+        init_repo "$repo"
+    done
+}
+
+main() {
+    init_all_repos
+}
+
+main "$@"

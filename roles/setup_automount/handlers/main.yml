@@ -1,0 +1,20 @@
+- name: Reload systemd daemon
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+  listen: "load automount"
+
+- name: Restart cryptsetup
+  become: true
+  ansible.builtin.systemd:
+    state: restarted
+    name: cryptsetup.target
+  listen: "load automount"
+
+- name: Restart automount
+  become: true
+  ansible.builtin.systemd:
+    state: restarted
+    name: "{{ item }}"
+  loop: "{{ setup_automount__handler__load_automount }}"
+  listen: "load automount"

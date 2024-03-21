@@ -1,0 +1,11 @@
+---
+- name: Create timer {{ systemd__create_service__file_name }}
+  become: true
+  ansible.builtin.template:
+    src: "systemd_timer.j2"
+    dest: "{{ systemd__create_timer__file_path }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - "enable timer"

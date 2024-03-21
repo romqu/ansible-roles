@@ -1,0 +1,33 @@
+---
+- name: Ensure dir exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ luks__encrypt__keyfile_dir_path }}"
+    state: directory
+
+- name: Create passphrase keyfile
+  become: true
+  ansible.builtin.copy:
+    dest: "{{ luks__encrypt__keyfile_file_path }}"
+    content: "{{ luks__encrypt__passphrase }}"
+    owner: root
+    group: root
+    mode: "0400"
+
+- name: Run when at least one drive found
+  when: luks__encrypt__drives | length > 0
+  become: true
+  block:
+    - name: Install cryptsetup
+      ansible.builtin.apt:
+        name: cryptsetup
+        state: present
+
+    - name: Create LUKS container with a keyfile
+      community.crypto.luks_device:
+        device: "/dev/{{ item }}"
+        state: "present"
+        keyfile: "{{ luks__encrypt__keyfile_file_path }}"
+        type: "luks2"
+        pbkdf: { "algorithm": "argon2id" }
+      loop: "{{ luks__encrypt__drives }}"

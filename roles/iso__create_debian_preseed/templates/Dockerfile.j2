@@ -1,0 +1,30 @@
+FROM debian:latest as build
+
+RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
+--mount=target=/var/cache/apt,type=cache,sharing=locked \
+rm -f /etc/apt/apt.conf.d/docker-clean \
+&& apt-get update \
+&& apt-get install -y --no-install-recommends \
+genisoimage \
+xorriso    \
+cpio \
+isolinux \
+curl \
+&& rm -rf /var/lib/apt/lists/* \
+&& rm -rf /usr/share/doc && rm -rf /usr/share/man \
+&& apt-get clean
+
+WORKDIR "/root"
+
+RUN curl -kL {{ iso__create_debian_preseed__url }} -o debian.iso
+
+ADD --chmod=0755 prepare-iso-build.sh .
+RUN ./prepare-iso-build.sh
+
+ADD --chmod=0755 build-iso.sh .
+ADD grub.cfg .
+ADD preseed.cfg .
+RUN ./build-iso.sh
+
+FROM scratch AS export-iso
+COPY --from=build /root/{{ iso__create_debian_preseed__iso_name }} .

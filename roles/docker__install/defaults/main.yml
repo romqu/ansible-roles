@@ -1,0 +1,3 @@
+docker__install__distribution: "{{ ansible_distribution | lower }}"
+docker__install__distribution_release: "{{ ansible_distribution_release }}"
+

@@ -1,0 +1,124 @@
+# ansible_become_pass: null # set via bitwarden lookup
+
+bitwarden__create_folder__folder_name: "home"
+bitwarden__create_folder__folder_parent: "private/server"
+
+
+bitwarden__generate_password__length: 16
+
+
+bitwarden__create_item__type: "login"
+bitwarden__create_item__item_name: "{{ test_vm__bitwarden__item_name }}"
+bitwarden__create_item__item_username: "roman"
+bitwarden__create_item__item_password: "{{ bitwarden__generate_password__result }}"
+bitwarden__create_item__item_folder_id: "{{ bitwarden__create_folder__result_folder_id }}"
+
+
+ssh__create_keypair__passphrase: "{{ bitwarden__generate_password__result }}"
+ssh__create_keypair__type: "ed25519"
+ssh__create_keypair__name: "test_vm_01_key"
+ssh__create_keypair__dir_path: "~/.ssh/ansible_keys"
+
+
+ssh__create_config__file_name: "{{ ssh__create_keypair__name }}_config"
+ssh__create_config__identity_file_path: "{{ ssh__create_keypair__dir_path }}/{{ ssh__create_keypair__name }}"
+ssh__create_config__host: "{{ shared__test_vm__ssh_host }}"
+ssh__create_config__host_name: "{{ shared__test_vm__hostname }}"
+ssh__create_config__user: "{{ shared__test_vm__username }}"
+ssh__create_config__port: "{{ test_vm__ssh_port }}"
+ssh__create_config__accept_new: true
+ssh__create_config__add_root: true
+ssh__create_config__host_root: "{{ shared__test_vm__ssh_dropbear_root_host }}"
+
+
+iso__create_debian_preseed__iso_name: "{{ debian_preseed_iso_name }}"
+iso__create_debian_preseed__scripts_dir_path: "{{ debian_vm_tmp_scripts_dir_path }}"
+iso__create_debian_preseed__iso_dir_path: "{{ debian_vm_tmp_iso_dir_path }}"
+iso__create_debian_preseed__debian_architecture: "{{ debian_architecture }}"
+iso__create_debian_preseed__debian_version: "{{ debian_version }}"
+iso__create_debian_preseed__sudo_without_password: true
+iso__create_debian_preseed__preseed_username: "{{ shared__test_vm__username }}"
+iso__create_debian_preseed__preseed_user_password: "{{ bitwarden__generate_password__result }}"
+iso__create_debian_preseed__preseed_dropbear_ssh_port: "{{ test_vm__ssh_port }}"     
+iso__create_debian_preseed__preseed_user_password_crypted: "{{ bitwarden__generate_password__result }}"
+iso__create_debian_preseed__preseed_ip: "{{ debian_vm_ip }}"
+iso__create_debian_preseed__preseed_gateway_ip: "{{ debian_vm_dhcp_start_address }}"
+iso__create_debian_preseed__preseed_subnet_mask: "{{ debian_vm_dhcp_subnet_mask }}"
+iso__create_debian_preseed__encrypt_boot_drive: true
+iso__create_debian_preseed__encrypt_password: "{{ bitwarden__generate_password__result }}"
+iso__create_debian_preseed__ssh_pub_key_file_path: "{{ ssh__create_keypair__pub_file_path }}"
+
+
+vm__setup_debian__scripts_dir_path: "{{ debian_vm_tmp_scripts_dir_path }}"
+vm__setup_debian__files_dir_path: "{{ debian_vm_tmp_files_dir_path }}"
+vm__setup_debian__iso_dir_path: "{{ debian_vm_tmp_iso_dir_path }}"
+vm__setup_debian__image_file: "{{ debian_vm_image_file }}"
+vm__setup_debian__image_size: 10G
+vm__setup_debian__ssh_port: "{{ ssh__create_config__port }}"
+vm__setup_debian__ssh_host: "{{ debian_vm_ip }}"
+vm__setup_debian__is_encrypted: "{{ iso__create_debian_preseed__encrypt_boot_drive }}"
+vm__setup_debian__crypt_password: "{{ debian_vm__crypt_password }}"
+vm__setup_debian__ssh_dropbear_root_host: "{{ shared__test_vm__ssh_dropbear_root_host }}"
+vm__setup_debian__ssh_dropbear_root_password: "{{ debian_vm__ssh_dropbear_root_password }}"
+vm__setup_debian__hdd_image_name: "{{ debian_vm_hdd_image_name  }}"
+vm__setup_debian__hdd_image_format: "{{ debian_vm_hdd_image_format }}"
+vm__setup_debian__hdd_image_quantity: "{{ debian_vm_hdd_image_quantity }}"
+vm__setup_debian__qemu_monitor_socket_path: "{{ qemu_monitor_socket_path }}"
+vm__setup_debian__vm_net: "{{ debian_vm_net }}"
+vm__setup_debian__vm_dhcp_start_address: "{{ debian_vm_dhcp_start_address }}"
+vm__setup_debian__vm_tmp_image_file_path: "{{ debian_vm_tmp_image_file_path }}"
+vm__setup_debian__vm_image_format: "{{ debian_vm_image_format }}"
+vm__setup_debian__vm_tmp_iso_file_path: "{{ debian_vm_tmp_iso_file_path }}"
+vm__setup_debian__vm_ip: "{{ debian_vm_ip }}"
+vm__setup_debian__vm_tmp_dir_path: "{{ debian_vm_tmp_dir_path }}"
+vm__setup_debian__vm_persistent_dir_path: "{{ debian_vm_persistent_dir_path }}"
+vm__setup_debian__vm_kernel_img_name: "{{ debian_vm_kernel_img_name }}"
+vm__setup_debian__vm_initrd_img_name: "{{ debian_vm_initrd_img_name }}"
+
+
+bitwarden__get_password__result: "{{ lookup('community.general.bitwarden', test_vm__bitwarden__item_name, field='password') | regex_replace(\"^(\\[')(.*)('\\])$\", '\\2') }}"
+vm__start_debian__become: true
+vm__start_debian__is_encrypted: "{{ iso__create_debian_preseed__encrypt_boot_drive }}"
+vm__start_debian__ssh_port: "{{ test_vm__ssh_port }}"
+vm__start_debian__ssh_host: "{{ shared__test_vm__hostname }}"
+vm__start_debian__ssh_dropbear_root_host: "{{ shared__test_vm__ssh_dropbear_root_host }}"
+vm__start_debian__ssh_dropbear_root_password: "{{ bitwarden__get_password__result }}"
+vm__start_debian__crypt_password: "{{ bitwarden__get_password__result }}"
+vm__start_debian__vm_tmp_files_dir_path: "{{ debian_vm_tmp_files_dir_path }}"
+vm__start_debian__vm_tmp_dir_path: "{{ debian_vm_tmp_dir_path }}"
+vm__start_debian__vm_tmp_scripts_dir_path: "{{ debian_vm_tmp_scripts_dir_path }}"
+vm__start_debian__vm_persistent_dir_path: "{{ debian_vm_persistent_dir_path }}"
+vm__start_debian__hdd_image_name: "{{ debian_vm_hdd_image_name  }}"
+vm__start_debian__hdd_image_format: "{{ debian_vm_hdd_image_format }}"
+vm__start_debian__hdd_image_quantity: "{{ debian_vm_hdd_image_quantity }}"
+vm__start_debian__vm__hostname: "{{ shared__test_vm__hostname }}"
+vm__start_debian__vm_kernel_img_file_path: "{{ debian_vm_kernel_img_file_path }}"
+vm__start_debian__vm_initrd_img_file_path: "{{ debian_vm_initrd_img_file_path }}"
+vm__start_debian__vm_net: "{{ debian_vm_net }}"
+vm__start_debian__vm_dhcp_start_address: "{{ debian_vm_dhcp_start_address }}"
+vm__start_debian__vm_tmp_image_file_path: "{{ debian_vm_tmp_image_file_path }}"
+vm__start_debian__vm_image_format: "{{ debian_vm_image_format }}"
+vm__start_debian__vm_files_dir_path: "{{ debian_vm_tmp_files_dir_path }}"
+
+
+
+
+# 
+# 
+# 
+# sshd__setup_config__port: "22"
+# 
+# 
+# debian_vm__ssh_dropbear_root_password: "{{ bitwarden__generate_password__result }}"
+# debian_vm__crypt_password: "{{ bitwarden__generate_password__result }}"
+# 
+# 
+
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 

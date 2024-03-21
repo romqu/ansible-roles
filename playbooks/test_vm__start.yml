@@ -1,0 +1,6 @@
+---
+- name: Start test vm
+  hosts: localhost
+  roles:
+    - role: vm/vm__start_debian
+      delegate_to: localhost

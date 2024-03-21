@@ -1,0 +1,12 @@
+[Unit]
+Description={{ systemd__create_timer__description }}
+
+[Timer]
+Unit={{ systemd__create_timer__unit }}
+#OnCalendar={{ systemd__create_timer__on_calendar }}
+OnBootSec={{ systemd__create_timer__on_boot_sec }}
+OnUnitActiveSec={{ systemd__create_timer__on_unit_active_sec }}
+Persistent=true
+
+[Install]
+WantedBy={{ systemd__create_timer__wanted_by }}

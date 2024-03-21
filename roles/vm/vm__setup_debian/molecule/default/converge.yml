@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include vm__start_debian"
+      include_role:
+        name: "setup_debian_vm"

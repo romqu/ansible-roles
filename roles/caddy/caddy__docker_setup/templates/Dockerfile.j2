@@ -1,0 +1,8 @@
+FROM caddy:{{ caddy__docker_setup__version }}-builder AS builder
+
+RUN xcaddy build \
+    --with github.com/caddy-dns/hetzner
+
+FROM caddy:{{ caddy__docker_setup__version }}
+
+COPY --from=builder /usr/bin/caddy /usr/bin/caddy

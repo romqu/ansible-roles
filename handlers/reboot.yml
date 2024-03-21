@@ -1,0 +1,41 @@
+- name: Reboot
+  when: not handler_reboot__encrypted
+  become: true
+  reboot:
+  listen: "reboot"
+
+- name: Reset known hosts for {{ debian_vm_ip }}
+  when: handler_reboot__encrypted
+  ansible.builtin.command: ssh-keygen -R {{ debian_vm_ip }}
+  delegate_to: localhost
+  listen: "reboot"
+
+- name: Reboot encrypted
+  when: handler_reboot__encrypted
+  become: true
+  ansible.builtin.command: reboot
+  listen: "reboot"
+
+- name: Wait for initramfs ssh
+  when: handler_reboot__encrypted
+  ansible.builtin.include_tasks: "../roles/shared_tasks/tasks/wait_for_initramfs_ssh.yml"
+  listen: "reboot"
+  vars:
+    wait_for_ssh__host: "{{ handler_reboot__wait_for_initramfs_ssh_host }}"
+    wait_for_ssh__retries: "{{ handler_reboot__wait_for_initramfs_ssh_retries }}"
+    wait_for_ssh__delay: "{{ handler_reboot__wait_for_initramfs_ssh_delay }}"
+
+- name: Unlock encrypted volume
+  when: handler_reboot__encrypted
+  ansible.builtin.include_tasks: "../roles/shared_tasks/tasks/unlock_encrypted_volume.yml"
+  listen: "reboot"
+  vars:
+    unlock_encrypted_volume__ssh_password: "{{ handler_reboot__unlock_encrypted_volume_ssh_password }}"
+    unlock_encrypted_volume__ssh_host: "{{ handler_reboot__unlock_encrypted_volume_ssh_host }}"
+    unlock_encrypted_volume__crypt_password: "{{ handler_reboot__unlock_encrypted_volume_crypt_password }}"
+
+- name: Reset known hosts for {{ debian_vm_ip }}
+  when: handler_reboot__encrypted
+  ansible.builtin.command: ssh-keygen -R {{ debian_vm_ip }}
+  delegate_to: localhost
+  listen: "reboot"

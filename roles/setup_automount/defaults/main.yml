@@ -1,0 +1,2 @@
+setup_automount__disks_with_partition: [ { "disk_name": "sdb", "partition_name": "sdb0", } ]
+setup_automount__disks: [ ]

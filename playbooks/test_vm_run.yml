@@ -1,0 +1,79 @@
+---
+- name: Setup test vm
+  hosts: test_vm_01
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+  vars:
+  #ansible_python_interpreter: "/Users/roman/projects/personal/ansible-server-config/venv/bin/python"
+  
+  roles:
+    - role: sshd__setup_config
+    - role: hdd/hdd__get_all
+    - role: hdd/hdd__wipe
+    - role: luks/luks__encrypt
+    - role: luks/luks__open
+    #- role: format_hard_drives
+    #- role: setup_automount
+    #- role: create_backup_dirs
+    #- role: docker__install
+    #- role: restic__docker_setup
+    #- role: systemd__create_service
+    #- role: systemd__create_timer
+    #- role: caddy/caddy__docker_setup
+    #- role: caddy/caddy__add_site
+    #- role: tailscale__docker_setup
+
+
+#     - role: get_bitwarden__field
+#       vars:
+#         - get_bitwarden__field__fields:
+#             [
+#               {
+#                 "get_bitwarden__field__fact_name": "get_bitwarden__field__b2_eu_master_key",
+#                 "get_bitwarden__field__entry_name": "backblaze-eu",
+#                 "get_bitwarden__field__field_name": "masterApplicationKey",
+#               },
+#               {
+#                 "get_bitwarden__field__fact_name": "get_bitwarden__field__b2_us_west_master_key_id",
+#                 "get_bitwarden__field__entry_name": "backblaze-us-west",
+#                 "get_bitwarden__field__field_name": "masterKeyId",
+#               },
+#               {
+#                 "get_bitwarden__field__fact_name": "get_bitwarden__field__b2_us_west_master_key",
+#                 "get_bitwarden__field__entry_name": "backblaze-us-west",
+#                 "get_bitwarden__field__field_name": "masterApplicationKey",
+#               },
+#             ]
+#     - role: setup_b2_buckets
+#       vars:
+#         - setup_b2_buckets__bucket_name_uuid: "{{ host_uuid }}"
+#         - setup_b2_buckets__accounts: [
+#               {
+#                 "master_key_id": "", # "{{ get_bitwarden__field__b2_eu_master_key_id }}"
+#                 "master_key": "", # "{{ get_bitwarden__field__b2_eu_master_key }}"
+#                 "profile_name": "main",
+#               },
+#               {
+#                 "master_key_id": "", # "{{ get_bitwarden__field__b2_us_west_master_key_id }}",
+#                 "master_key": "", # "{{ get_bitwarden__field__b2_us_west_master_key }}",
+#                 "profile_name": "replication",
+#               },
+#             ]
+#     - role: bitwarden__generate_password
+#     - role: converter_b2_bitwarden
+#       vars:
+#         - converter_b2_bitwarden___b2_account_data: "{{ setup_b2_buckets__accounts__result }}"
+#         - converter_b2_bitwarden___field_name: "restic_password"
+#         - converter_b2_bitwarden___field_value: "{{ bitwarden__generate_password__result }}"
+#     - role: bitwarden__create_item
+#       vars:
+#         - bitwarden__create_item__type: "login"
+#         - bitwarden__create_item__folder_name: "server/home"
+#         - bitwarden__create_item__type_login_data: "{{ converter_b2_bitwarden___result }}"
+#     - role: create_backup_dirs
+#       vars:
+#         - create_backup_dirs__disks_mount_dir_paths: "{{ setup_automount__disks_mount_dir_paths }}"
+#         - create_backup_dirs__dir_name: "backup"
+#         - create_backup_dirs__backup_dir_owner: "{{ shared__test_vm__username }}"
+#         - create_backup_dirs__main_dir_marker_file_name: "{{ host_uuid }}"
+

@@ -1,0 +1,32 @@
+---
+- name: Install bcrypt
+  become: true
+  ansible.builtin.apt:
+    name: "{{ list }}"
+    allow_unauthenticated: true
+  vars:
+    list: [build-essential, cargo, python3-bcrypt]
+
+- name: Install python bcrypt
+  ansible.builtin.pip:
+    name: bcrypt
+    virtualenv: "{{ lookup('ansible.builtin.env', 'VIRTUAL_ENV', default='.venv') }}"
+
+- name: Create dir '{{ ssh__create_keypair__dir_path  }}'
+  ansible.builtin.file:
+    path: "{{ ssh__create_keypair__dir_path  }}"
+    state: directory
+    mode: '0700'
+
+- name: Backup old ssh key if does exists
+  ansible.builtin.copy:
+    src: "{{ ssh__create_keypair__file_path }}"
+    dest: "{{ ssh__create_keypair__file_path }}.{{ ansible_date_time.iso8601_basic }}.bak"
+    mode: '0700'
+
+- name: Create ssh keypair '{{ ssh__create_keypair__dir_path }}/{{ ssh__create_keypair__name }}'
+  community.crypto.openssh_keypair:
+    path: "{{ ssh__create_keypair__file_path }}"
+    passphrase: "{{ ssh__create_keypair__passphrase }}"
+    type: "{{ ssh__create_keypair__type }}"
+    regenerate: "full_idempotence"

@@ -1,0 +1,10 @@
+{
+  "ANSIBLE_MODULE_ARGS": {
+    "type": "item",
+    "name": "login1",
+    "username": "",
+    "folder_id": "",
+    "folder_name": "private/server/home",
+    "password": "password"
+  }
+}

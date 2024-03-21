@@ -1,0 +1,8 @@
+create_backup_dirs__disks_mount_dir_paths: [ ]
+create_backup_dirs__dir_name: "backup"
+create_backup_dirs__disks_backup_dir_paths: [ ]
+create_backup_dirs__main_dir_marker_file_name: "" # uuid
+create_backup_dirs__main_dir_marker_file: "{{ '.' + create_backup_dirs__main_dir_marker_file_name }}" # .uuid
+create_backup_dirs__main_backup_dir_path: "{{ create_backup_dirs__disks_backup_dir_paths[0] + '/' + create_backup_dirs__main_dir_marker_file }}"
+create_backup_dirs__result: [ ] # paths
+create_backup_dirs__main_backup_dir_found_files: [ ]

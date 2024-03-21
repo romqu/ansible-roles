@@ -1,0 +1,13 @@
+caddy__docker_setup__version: "2.7.6"
+
+caddy__docker_setup__config_dir_path: null
+
+caddy__docker_setup__sub_configs_dir_name: "conf.d"
+caddy__docker_setup__sub_configs_dir_path:
+  "{{ caddy__docker_setup__dir_path }}/{{ caddy__docker_setup__sub_configs_dir_name }}"
+
+caddy__docker_setup__email: null
+caddy__docker_setup__acme_ca_url: "https://acme-staging-v02.api.letsencrypt.org/directory"
+caddy__docker_setup__acme_dns_hetzner_api_token: null
+
+caddy__docker_setup__data_backup_dir_path: null

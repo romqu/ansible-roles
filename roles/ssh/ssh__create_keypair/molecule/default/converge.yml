@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include ssh__create_keypair"
+      include_role:
+        name: "ssh__create_keypair"

@@ -1,0 +1,15 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: "Include encrypt_hard_drives"
+      ansible.builtin.include_role:
+        name: "encrypt_hard_drives"
+      vars:
+        - debian_vm_hdd_image_files_0: {
+          'results': [
+            'stdout': '{{ debian_vm_hdd_image_name  }}_0.qcow2',
+            'stdout': '{{ debian_vm_hdd_image_name  }}_1.qcow2',
+          ]
+        }

@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Main",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/library/bitwarden/main.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "${workspaceRoot}"
+      },
+      "justMyCode": true,
+      "args": [
+        "${workspaceFolder}/library/bitwarden/create/bitwarden__create_item.json"
+      ]
+    }
+  ]
+}

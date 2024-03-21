@@ -1,0 +1,11 @@
+---
+- name: Create service {{ systemd__create_service__file_name }}
+  become: true
+  ansible.builtin.template:
+    src: "systemd_unit.service.j2"
+    dest: "{{ systemd__create_service__file_path }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - Reload systemd daemon

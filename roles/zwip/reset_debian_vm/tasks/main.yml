@@ -1,0 +1,7 @@
+---
+- name: run on macos
+  include_tasks: macos.yml
+  args:
+    apply:
+      delegate_to: localhost
+  when: ansible_distribution == 'MacOSX'

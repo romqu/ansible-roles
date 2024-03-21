@@ -1,0 +1,11 @@
+---
+- name: create user "{{ create_user_name }}"
+  become: true
+  user:
+    name: "{{ create_user_name }}"
+    update_password: always
+    password: "{{ create_user_password | string | password_hash('sha512', create_user_password_salt) }}"
+    shell: "{{ create_user_shell }}"
+    create_home: yes
+    append: yes
+    groups: sudo

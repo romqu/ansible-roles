@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include create_bitwarden__item"
+      include_role:
+        name: "create_bitwarden__item"

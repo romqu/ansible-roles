@@ -1,0 +1,21 @@
+systemd__create_service__file_name: "ansible_service"
+systemd__create_service__file_ext_name: "service"
+systemd__create_service__file: >-
+  {{ systemd__create_service__file_name
+    + '.'
+    + systemd__create_service__file_ext_name
+  }}
+systemd__create_service__dir_path: "/etc/systemd/system"
+systemd__create_service__file_path: >-
+  {{ systemd__create_service__dir_path
+    + '/'
+    + systemd__create_service__file
+  }}
+
+systemd__create_service__user: "{{ ansible_user_id }}"
+systemd__create_service__group: "{{ ansible_user_id }}"
+
+systemd__create_service__description: "ansible_service"
+systemd__create_service__type: "oneshot"
+systemd__create_service__exec_start: "ls /"
+systemd__create_service__wanted_by: "multi-user.target"

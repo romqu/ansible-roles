@@ -1,0 +1,47 @@
+---
+- name: Get item(s)
+  ansible.builtin.command: bw get item {{ item.name }}
+  register: bitwarden__update_items__get_items_result
+  loop: "{{ bitwarden__update_items__type_login_data }}"
+  environment:
+    PATH: "/opt/homebrew/bin:{{ ansible_env.PATH }}"
+  changed_when: true
+
+- name: Append item json
+  ansible.builtin.set_fact:
+    bitwarden__update_items__data: "{{ appended }}"
+  loop: "{{ bitwarden__update_items__get_items_result.results }}"
+  loop_control:
+    index_var: index
+  vars:
+    login_data: "{{ bitwarden__update_items__type_login_data[index] }}"
+    combined: "{{ login_data | combine({'item_json': item.stdout}) }}"
+    appended: "{{ bitwarden__update_items__data | default([]) + [combined] }}"
+
+- name: Upade item json with changes
+  ansible.builtin.set_fact:
+    fact: >
+      {% set ns = namespace(updated_json='', json_list=[]) %}
+      {% for item in bitwarden__update_items__data %}
+        {% set outer_loop = loop %}
+        {% set ns.updated_json = item['item_json'] | from_yaml | to_json %}
+        {% for change in item.changes %}
+          {% set change_key_value = lookup('dict', change) %}
+          {% set regex = '(\"' + change_key_value.key + '\":).*?(,|})' %}
+          {% set replace = '\\1' + '\"' + change_key_value.value + '\"' + '\\2' %}
+          {% set replaced = ns.updated_json | regex_replace(regex, replace) %}
+          {% set ns.updated_json = replaced %}
+        {% endfor %}
+        {% set _ = ns.json_list.append(ns.updated_json) %}
+      {% endfor %}
+      {{ ns.json_list }}
+
+- name: Update item
+  ansible.builtin.shell: echo '{{ item_json }}' | bw encode | bw edit item {{ item_id }}
+  loop: "{{ fact | trim }}"
+  vars:
+    item_dict: "{{ item | from_yaml }}"
+    item_json: "{{ item_dict | to_json }}"
+    item_id: "{{ item_dict['id'] }}"
+  environment:
+    PATH: "/opt/homebrew/bin:{{ ansible_env.PATH }}"

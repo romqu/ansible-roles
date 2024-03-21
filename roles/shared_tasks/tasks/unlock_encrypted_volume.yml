@@ -1,0 +1,12 @@
+- name: Install pexpect
+  ansible.builtin.pip:
+    name: pexpect
+    virtualenv: "{{ lookup('ansible.builtin.env', 'VIRTUAL_ENV', default='.venv') }}"
+
+
+- name: Unlock encrypted volume
+  ansible.builtin.expect:
+    command: ssh {{ unlock_encrypted_volume__ssh_host }} "echo -n {{ unlock_encrypted_volume__crypt_password }} | cryptroot-unlock"
+    responses:
+      (?i)Enter passphrase: "{{ unlock_encrypted_volume__ssh_password }}"
+  no_log: false

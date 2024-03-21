@@ -1,0 +1,9 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include setup_ssh"
+      include_role:
+        name: "setup_ssh"
+      vars:
+        - ssh_port: "1234"

@@ -1,0 +1,158 @@
+### installer locale settings
+d-i debian-installer/language string {{ iso__create_debian_preseed__preseed_language }}
+d-i debian-installer/country string {{ iso__create_debian_preseed__preseed_country }}
+d-i debian-installer/locale string {{ iso__create_debian_preseed__preseed_locale }}
+#d-i keymap select {{ iso__create_debian_preseed__preseed_keymap }}
+
+d-i console-setup/ask_detect boolean false
+d-i keyboard-configuration/variant select {{ iso__create_debian_preseed__preseed_keyboard_variant }}
+d-i keyboard-configuration/xkb-keymap select {{ iso__create_debian_preseed__preseed_keymap }}
+
+### network
+d-i netcfg/choose_interface select {{ iso__create_debian_preseed__preseed_choose_interface }}
+#d-i netcfg/get_ipaddress string 192.168.0.155
+#d-i netcfg/get_netmask string 255.255.255.0
+#d-i netcfg/get_gateway string 192.168.0.1
+#d-i netcfg/get_nameservers string 192.168.0.1
+#d-i netcfg/confirm_static boolean true
+d-i netcfg/get_hostname string {{ iso__create_debian_preseed__preseed_hostname }}
+d-i netcfg/get_domain string {{ iso__create_debian_preseed__preseed_domain }}
+
+### clock/timezone
+d-i clock-setup/utc boolean true
+d-i clock-setup/ntp boolean true
+d-i time/zone string {{ iso__create_debian_preseed__preseed_time_zone }}
+
+# https://github.com/coreprocess/linux-unattended-installation/blob/master/ubuntu/20.04/custom/preseed.cfg
+# https://www.pasta.freemyip.com/computing/articles/preparing-a-debian-10-netinst-usb-stick-with-preseeding-and-uefi-support/
+### Do NOT install on the USB stick(!)
+#
+# The Debian installer will install on the first disk it finds which can
+# sometimes be the USB stick itself. Work around this by rolling our own auto
+# detect logic which disallows installing on USB devices.
+d-i partman/early_command string \
+    list-devices usb-partition | sed 's/.$//' | sort -u > /tmp/usb-disks; \
+    list-devices disk | sort > /tmp/all-disks; \
+    INSTALL_DISK=$(fgrep -vxf /tmp/usb-disks /tmp/all-disks | head -1); \
+    debconf-set partman-auto/disk $INSTALL_DISK; \
+    debconf-set grub-installer/bootdev $INSTALL_DISK 
+
+### drive partioning
+## gpt
+d-i partman-basicfilesystems/choose_label string gpt
+d-i partman-basicfilesystems/default_label string gpt
+d-i partman-partitioning/choose_label string gpt
+d-i partman-partitioning/default_label string gpt
+d-i partman/choose_label string gpt
+d-i partman/default_label string gpt
+
+{% if iso__create_debian_preseed__encrypt_boot_drive %}
+## encrypted
+d-i grub-installer/only_debian boolean true
+d-i grub-installer/with_other_os boolean false
+d-i grub-installer/bootdev string default
+d-i partman-auto-crypto/erase_disks boolean false
+d-i partman-auto/init_automatically_partition select biggest_free
+d-i partman-lvm/device_remove_lvm boolean true
+d-i partman-md/device_remove_md boolean true
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+d-i partman-auto/method string crypto
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=656710
+d-i partman-crypto/passphrase password {{ iso__create_debian_preseed__encrypt_password }}
+d-i partman-crypto/passphrase-again password {{ iso__create_debian_preseed__encrypt_password }}
+d-i partman-crypto/weak_passphrase boolean true
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=656710
+# https://bugs.kali.org/view.php?id=1140
+d-i partman-crypto/erase_data boolean false
+# https://bugs.kali.org/view.php?id=1140
+d-i partman/default_filesystem string ext4
+d-i partman-auto-lvm/new_vg_name string primary
+d-i partman-auto-lvm/guided_size string max
+d-i partman-lvm/confirm boolean true
+d-i partman-lvm/confirm_nooverwrite boolean true
+d-i partman-auto/choose_recipe select atomic
+{% else %}
+## unenrycpted
+d-i partman-auto/method string regular
+d-i partman-auto/choose_recipe select atomic
+d-i partman/choose_partition select finish
+d-i partman/confirm_write_new_label boolean true
+d-i partman/confirm boolean  true
+d-i partman/confirm_nooverwrite boolean true
+{% endif %}
+
+
+### apt/mirror
+d-i mirror/country string manual
+d-i mirror/http/hostname string {{ iso__create_debian_preseed__preseed_mirror_hostname }}
+d-i mirror/http/directory string {{ iso__create_debian_preseed__preseed_mirror_directory }}
+d-i mirror/http/proxy string
+
+## packages
+tasksel tasksel/first multiselect standard, ssh-server
+popularity-contest popularity-contest/participate boolean false
+
+
+### user/root setup
+d-i passwd/root-login boolean false
+#d-i passwd/root-password-crypted password {{ iso__create_debian_preseed__preseed_root_password_crypted }}
+d-i passwd/user-fullname string {{ iso__create_debian_preseed__preseed_username_full }}
+d-i passwd/username string {{ iso__create_debian_preseed__preseed_username }}
+d-i passwd/user-password password {{ iso__create_debian_preseed__preseed_user_password }}
+d-i passwd/user-password-again password {{ iso__create_debian_preseed__preseed_user_password }}
+#d-i passwd/user-password-crypted password {{ iso__create_debian_preseed__preseed_user_password_crypted }}
+
+
+{% set ns = namespace(late_command=
+"in-target sh -c 'mkdir -p --mode=0700 /home/" + iso__create_debian_preseed__preseed_username + "/.ssh'; \\"
++ "\n"
++ "in-target sh -c 'echo " + iso__create_debian_preseed__ssh_pub_key.stdout + " > /home/" + iso__create_debian_preseed__preseed_username + "/.ssh/authorized_keys'; \\"
++ "\n"
++ "in-target sh -c 'chmod 0600 /home/" + iso__create_debian_preseed__preseed_username + "/.ssh/authorized_keys'; \\"
++ "\n"
++ "in-target sh -c 'chown -R " + iso__create_debian_preseed__preseed_username + " /home/" + iso__create_debian_preseed__preseed_username + "/.ssh';"
+) 
+%}
+
+
+{% if iso__create_debian_preseed__encrypt_boot_drive %}
+{% set ns.late_command = ns.late_command
++ " \\"
++ "\n"
++ "in-target sh -c 'apt update && apt upgrade'; \\"
++ "\n"
++ "in-target sh -c 'apt install -y dropbear-initramfs'; \\"
++ "\n"
++ "in-target sh -c \"sed -i -r 's/#(DROPBEAR_OPTIONS=)/\\1\\\"-I 180 -j -k -p " + iso__create_debian_preseed__preseed_dropbear_ssh_port + " -s \\\"/' /etc/dropbear/initramfs/dropbear.conf\"; \\"
++ "\n"
++ "in-target sh -c \"echo 'IP=" + iso__create_debian_preseed__preseed_ip + "::" + iso__create_debian_preseed__preseed_gateway_ip + ":" + iso__create_debian_preseed__preseed_subnet_mask + ":" + iso__create_debian_preseed__preseed_server_name + "' >> /etc/initramfs-tools/initramfs.conf\"; \\"
++ "\n"
++ "in-target sh -c 'mkdir /etc/dropbear/initramfs/'; \\"
++ "\n"
++ "in-target sh -c 'echo " +  iso__create_debian_preseed__ssh_pub_key.stdout + " > /etc/dropbear/initramfs/authorized_keys'; \\"
++ "\n"
++ "in-target sh -c 'chmod 600 /etc/dropbear/initramfs/authorized_keys'; \\"
++ "\n"
++ "in-target sh -c 'update-initramfs -u -k all';"
++ "\n"
+%}
+{% endif %}
+
+
+{% if iso__create_debian_preseed__sudo_without_password %}
+{% set ns.late_command = ns.late_command 
++ " \\"
++ "\n"
++ "in-target sh -c 'echo " + iso__create_debian_preseed__preseed_username + " ALL=(ALL) NOPASSWD: ALL\" >> etc/sudoers';"
++ "\n"
+%}
+{% endif %}
+
+d-i preseed/late_command string \
+{{ ns.late_command }}
+
+### reboot
+d-i finish-install/reboot_in_progress note

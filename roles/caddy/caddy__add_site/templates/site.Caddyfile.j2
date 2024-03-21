@@ -1,0 +1,3 @@
+{{ 'https' if caddy__add_site__tls_enabled else 'http' }}://{{ caddy__add_site__domain_name }} {
+	respond "Hello world!"
+}

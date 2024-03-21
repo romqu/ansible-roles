@@ -1,0 +1,7 @@
+---
+- name: Create login item
+  include_tasks: item_login.yml
+  args:
+    apply:
+      delegate_to: localhost
+  when: bitwarden__update_items__type == 'login'

@@ -1,0 +1,17 @@
+---
+- name: Run when at least one drive found
+  when:
+    - format_hard_drives__drives | length > 0
+    - format_hard_drives__encrypted
+  become: true
+  block:
+    - name: Install parted
+      ansible.builtin.apt:
+        name: parted
+        state: present
+
+    - name: Create ext4 filesystem for {{ format_hard_drives__partition }}
+      community.general.filesystem:
+        fstype: "{{ format_hard_drives__partition_filesystem }}"
+        dev: "/dev/mapper/{{ item }}"
+      loop: "{{ format_hard_drives__partition }}"

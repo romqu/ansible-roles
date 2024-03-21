@@ -1,0 +1,47 @@
+docker network create \
+  --driver=bridge \
+  network-02
+
+sudo docker compose -f a.yml down
+sudo docker compose -f a.yml up -d
+sudo docker network prune
+
+
+sudo docker network create -d macvlan \
+    --subnet=10.0.2.2/24 \
+    --gateway=10.0.2.1 \
+    --ip-range=10.0.2.59/28 \
+    -o parent=enp0s1 \
+    --aux-address="myserver=10.0.2.60" \
+    macvlan0
+
+sudo ip link set enp0s1 promisc on
+sudo ip link add macvlan-shim link enp0s1 type macvlan mode bridge
+sudo ip addr add 10.0.2.60/28 dev macvlan-shim
+sudo ip link set macvlan-shim up
+
+
+###################################################
+
+sudo docker network create -d macvlan \
+    --subnet=192.168.178.37/24 \
+    --gateway=192.168.178.1 \
+    --ip-range=192.168.178.59/28 \
+    -o parent=eth0 \
+    --aux-address="myserver=192.168.178.60" \
+    macvlan0
+
+sudo ip link set eth0 promisc on
+sudo ip link add macvlan-shim link eth0 type macvlan mode bridge
+sudo ip addr add 192.168.178.60/28 dev macvlan-shim
+sudo ip link set macvlan-shim up
+
+sudo docker network create \
+  --driver=bridge \
+  --aux-address="myserver=192.168.178.60" \
+  br0
+
+docker volume create caddy
+
+
+172.20.0.2

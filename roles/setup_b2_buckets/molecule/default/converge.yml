@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include setup_b2_bucket"
+      include_role:
+        name: "setup_b2_bucket"

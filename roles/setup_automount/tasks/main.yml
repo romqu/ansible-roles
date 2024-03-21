@@ -1,0 +1,77 @@
+---
+- name: Run when at least one disk found
+  when:
+    - setup_automount__disks | length > 0
+  become: true
+  block:
+    - name: Register uuid for disks
+      ansible.builtin.shell: >
+        lsblk -l -o NAME,UUID |
+        grep -m 1 {{ item.disk_name }} |
+        awk '{ print $2 }'
+      register: setup_automount__disks_uuid_results
+      loop: "{{ setup_automount__disks }}"
+      changed_when: true
+
+    - name: Add disk uuids to data with fact 'setup_automount__disks_with_uuid'
+      ansible.builtin.set_fact:
+        setup_automount__disks_with_uuid: "{{ appended }}"
+      loop: "{{ setup_automount__disks_uuid_results.results }}"
+      loop_control:
+        index_var: index
+      vars:
+        disk_data: "{{ setup_automount__disks[index] }}"
+        combined: "{{ disk_data | combine({'uuid': item.stdout}) }}"
+        appended: "{{ setup_automount__disks_with_uuid | default([]) + [combined] }}"
+
+    - name: Add crypttab entry for {{ setup_automount__disks }}
+      ansible.builtin.lineinfile:
+        path: /etc/crypttab
+        line: "{{ crypttab_line }}"
+        regexp: "{{ crypttab_line }}"
+      loop: "{{ setup_automount__disks_with_uuid }}"
+      vars:
+        crypttab_line: >
+          {{ item.partition_name }} UUID={{ item.uuid }}
+          {{ setup_automount__keyfile_file_path }} noauto,nofail
+
+    - name: Set fact setup_automount__disks_mount_dir_paths
+      ansible.builtin.set_fact:
+        setup_automount__disks_mount_dir_paths: |
+          {{ setup_automount__disks_mount_dir_paths|default([])
+          + [setup_automount__mount_dir_path + "/" + item.partition_name] }}
+      loop: "{{ setup_automount__disks_with_uuid }}"
+
+    - name: Create mount folders for {{ setup_automount__disks }}
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ setup_automount__disk_mount_dir_owner }}"
+        group: "{{ setup_automount__disk_mount_dir_owner }}"
+        mode: '0755'
+      loop: "{{ setup_automount__disks_mount_dir_paths }}"
+
+    - name: Add fstab entry for {{ setup_automount__disks }}
+      ansible.builtin.lineinfile:
+        path: "/etc/fstab"
+        insertafter: EOF
+        line: "{{ fstab_line }}"
+        regexp: "{{ fstab_line }}"
+        create: true
+      loop: "{{ setup_automount__disks_with_uuid }}"
+      vars:
+        fstab_line: >
+          /dev/mapper/{{ item.partition_name }}
+          {{ setup_automount__mount_dir_path }}/{{ item.partition_name }}
+          {{ setup_automount__partition_filesystem }}
+          noauto,nofail,x-systemd.automount,x-systemd.idle-timeout={{ setup_automount__systemd_idle_timeout_sec }}
+          0 0
+
+    - name: Set fact 'setup_automount__handler__load_automount'
+      ansible.builtin.set_fact:
+        setup_automount__handler__load_automount: |
+          {{ setup_automount__handler__load_automount|default([])
+          + [setup_automount__mount_dir_name + "-" + item.partition_name + "." + "automount"] }}
+      loop: "{{ setup_automount__disks_with_uuid }}"
+      changed_when: true
+      notify: "load automount"

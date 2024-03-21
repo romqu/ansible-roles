@@ -1,0 +1,13 @@
+set menu_color_normal = white/black
+set menu_color_highlight = black/yellow
+
+insmod gzio
+
+set timeout=0
+set default=automated-install
+
+menuentry 'automated-install' {
+    set background_color=black
+    linux    /install.{{ iso__create_debian_preseed__architecture }}/vmlinuz  auto=true priority=critical --- quiet
+    initrd   /install.{{ iso__create_debian_preseed__architecture }}/initrd.gz
+}

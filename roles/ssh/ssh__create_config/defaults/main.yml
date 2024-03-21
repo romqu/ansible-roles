@@ -1,0 +1,16 @@
+ssh__create_config__user_ssh_dir_path: "~/.ssh"
+ssh__create_config__user_ssh_config_file_path: "{{ ssh__create_config__user_ssh_dir_path }}/config"
+
+ssh__create_config__file_name: null
+ssh__create_config__dir_path: "{{ ssh__create_config__user_ssh_dir_path }}/config.d"
+ssh__create_config__file_path: "{{ ssh__create_config__dir_path }}/{{ ssh__create_config__file_name }}"
+
+ssh__create_config__host: null
+ssh__create_config__host_name: null
+ssh__create_config__user: null
+ssh__create_config__port: null
+ssh__create_config__identity_file_name: null
+ssh__create_config__identity_file_path: "{{ ssh__create_config__user_ssh_dir_path }}/{{ ssh__create_config__identity_file_name }}"
+ssh__create_config__accept_new: false
+ssh__create_config__add_root: false
+ssh__create_config__host_root: "{{ ssh__create_config__host }}_root"

@@ -1,0 +1,10 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include create_debian_iso"
+      include_role:
+        name: "create_debian_iso"
+      vars:
+        - iso__create_debian_preseed__sudo_without_password: true
+        - iso__create_debian_preseed__encrypt_boot_drive: true

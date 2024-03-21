@@ -1,0 +1,11 @@
+---
+- name: add git repo
+  become: true
+  ansible.builtin.apt_repository:
+    repo: ppa:git-core/ppa
+
+- name: install git
+  become: true
+  apt:
+    name: git
+    state: present

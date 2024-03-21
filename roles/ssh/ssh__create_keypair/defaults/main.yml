@@ -1,0 +1,6 @@
+ssh__create_keypair__passphrase: ""
+ssh__create_keypair__type: "ed25519"
+ssh__create_keypair__name: "ansible_key"
+ssh__create_keypair__dir_path: "~/.ssh/ansible"
+ssh__create_keypair__file_path: "{{ ssh__create_keypair__dir_path }}/{{ ssh__create_keypair__name }}"
+ssh__create_keypair__pub_file_path: "{{ ssh__create_keypair__dir_path }}/{{ ssh__create_keypair__name }}.pub"

@@ -1,0 +1,142 @@
+---
+- name: install packages
+  community.general.homebrew:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - qemu
+    - socat
+    - sevenzip
+
+- name: install python packages
+  ansible.builtin.pip:
+    name: "{{ item }}"
+  loop:
+    - bcrypt
+    - cryptography
+    - passlib
+
+- name: create dirs
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ debian_vm_tmp_scripts_dir_path }}"
+    - "{{ debian_vm_tmp_files_dir_path }}"
+    - "{{ debian_vm_tmp_iso_dir_path }}"
+
+- name: create '{{ debian_vm_image_file }}' image
+  command: qemu-img create -f qcow2 {{ debian_vm_image_file }} {{ vm__setup_debian__image_size }}
+  args:
+    chdir: "{{ debian_vm_tmp_files_dir_path }}"
+
+- name: Register vm hdds
+  ansible.builtin.include_role:
+    name: "../roles/shared_tasks"
+    tasks_from: register_vm_hdds
+
+- name: create {{ debian_vm_hdd_image_quantity }} hdd image(s)
+  command: qemu-img create -f qcow2 {{ item.stdout }} {{ vm__setup_debian__hdd_image_size }}
+  args:
+    chdir: "{{ debian_vm_tmp_files_dir_path }}"
+  loop: "{{ debian_vm_hdd_image_files.results }}"
+
+- name: install preseeded debian vm
+  become: "{{ vm__setup_debian__become }}"
+  shell:
+    cmd: >-
+      qemu-system-aarch64 \
+          -daemonize \
+          -nodefaults \
+          -monitor unix:{{ qemu_monitor_socket_path }},server,nowait \
+          -bios '/opt/homebrew/share/qemu/edk2-aarch64-code.fd' \
+          -accel hvf \
+          -m 2048 \
+          -cpu host \
+          -smp 2 \
+          -serial null -parallel null -monitor none -display none -vga none \
+          -M virt,highmem=off \
+          -netdev vmnet-shared,id=net0,start-address={{ debian_vm_dhcp_start_address }},end-address={{ debian_vm_dhcp_end_address }},subnet-mask={{ debian_vm_dhcp_subnet_mask }} \
+          -nic vmnet-shared \
+          -device driver=virtio-net,netdev=net0 \
+          -drive if=none,file={{ debian_vm_tmp_image_file_path }},format={{ debian_vm_image_format }},id=hd0 \
+          -drive file="{{ debian_vm_tmp_iso_file_path }}",id=cdrom,if=none,media=cdrom \
+          -device virtio-blk-device,drive=hd0 \
+          -device virtio-scsi-device \
+          -device scsi-cd,drive=cdrom
+
+- name: Wait for installation to finish
+  include_tasks: "../roles/shared_tasks/tasks/wait_for_initramfs_ssh.yml"
+  vars:
+    wait_for_ssh__host: "{{ vm__setup_debian__ssh_host }}"
+    wait_for_ssh__delay: 30
+    wait_for_ssh__retries: 20
+
+- name: Reset known hosts for {{ debian_vm_ip }}
+  command: ssh-keygen -R {{ debian_vm_ip }}
+
+- name: Do when encrypted
+  block:
+    - name: Unlock encrypted drive
+      include_tasks: "../roles/shared_tasks/tasks/unlock_encrypted_volume.yml"
+      vars:
+        unlock_encrypted_volume__ssh_password: "{{ vm__setup_debian__ssh_dropbear_root_password }}"
+        unlock_encrypted_volume__ssh_host: "{{ vm__setup_debian__ssh_dropbear_root_host }}"
+        unlock_encrypted_volume__crypt_password: "{{ vm__setup_debian__crypt_password }}"
+
+    - name: Wait for ssh
+      ansible.builtin.wait_for:
+        port: 22
+        host: '{{ debian_vm_ip }}'
+        search_regex: OpenSSH
+        delay: 5
+  when: vm__setup_debian__is_encrypted
+
+- name: power down vm
+  become: "{{ vm__setup_debian__become }}"
+  ansible.builtin.shell: echo "system_powerdown" | socat - unix-connect:{{ qemu_monitor_socket_path }}
+
+- name: wait for shutdown to complete
+  ansible.builtin.wait_for:
+    path: "{{ qemu_monitor_socket_path }}"
+    state: absent
+
+- name: extract kernel and initrd
+  community.general.iso_extract:
+    executable: 7zz
+    image: "{{ item.image }}"
+    dest: "{{ item.dest }}"
+    files:
+      - "{{ item.file }}"
+  loop:
+    - {
+      image: "{{ debian_vm_tmp_image_file_path }}",
+      file: "{{ vm__setup_debian__extract_img_name }}",
+      dest: "{{ debian_vm_tmp_dir_path }}",
+    }
+    - {
+      image: "{{ vm__setup_debian__extract_img_file_path }}",
+      file: "{{ vm__setup_debian__extract_kernel_img_file }}",
+      dest: "{{ debian_vm_tmp_files_dir_path }}",
+    }
+    - {
+      image: "{{ vm__setup_debian__extract_img_file_path }}",
+      file: "{{ vm__setup_debian__extract_initrd_img_file }}",
+      dest: "{{ debian_vm_tmp_files_dir_path }}",
+    }
+
+- name: clear {{ debian_vm_persistent_dir_path }}
+  ansible.builtin.file:
+    state: "{{ item }}"
+    path: "{{ debian_vm_persistent_dir_path }}"
+  loop:
+    - absent
+    - directory
+
+- name: move files to {{ debian_vm_persistent_dir_path }}
+  shell: "mv -f {{ debian_vm_tmp_files_dir_path }}/* {{ debian_vm_persistent_dir_path }}"
+
+- name: delete {{ debian_vm_tmp_dir_path }} with content
+  file:
+    path: "{{ debian_vm_tmp_dir_path }}"
+    state: absent

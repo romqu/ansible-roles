@@ -1,0 +1,10 @@
+- name: Get field
+  ansible.builtin.set_fact:
+    "{{ item.get_bitwarden__field__fact_name }}": "{{ lookup('community.general.bitwarden', item.get_bitwarden__field__entry_name , field=item.get_bitwarden__field__field_name | default('password')) | regex_replace(\"^(\\[')(.*)('\\])$\", '\\2') }}"
+  loop: "{{ get_bitwarden__field__fields }}"
+
+#           {
+#             "get_bitwarden__field__fact_name": "",
+#             "get_bitwarden__field__entry_name": "",
+#             "get_bitwarden__field__field_name": "",
+#           },

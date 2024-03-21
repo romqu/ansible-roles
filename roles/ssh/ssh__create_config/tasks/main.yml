@@ -1,0 +1,28 @@
+---
+- name: Register 'exists' for '{{ ssh__create_config__identity_file_path }}'
+  ansible.builtin.stat:
+    path: "{{ ssh__create_config__identity_file_path }}"
+  register: stat_result
+
+- name: Fail if {{ ssh__create_config__identity_file_path }} does not exist
+  ansible.builtin.fail:
+    msg: "{{ ssh__create_config__identity_file_path }} does not exist"
+  when: not stat_result.stat.exists
+
+- name: Create dir '{{ ssh__create_config__dir_path }}'
+  ansible.builtin.file:
+    path: "{{ ssh__create_config__dir_path }}"
+    state: directory
+
+- name: Copy ssh config to '{{ ssh__create_config__file_path }}'
+  ansible.builtin.template:
+    src: "templates/ssh_config.j2"
+    dest: "{{ ssh__create_config__file_path }}"
+
+- name: Add include at BOF for '{{ ssh__create_config__dir_path }}' in '{{ ssh__create_config__user_ssh_config_file_path }}'
+  ansible.builtin.lineinfile:
+    path: "{{ ssh__create_config__user_ssh_config_file_path }}"
+    line: "Include {{ ssh__create_config__file_path }}"
+    insertbefore: BOF
+    create: yes
+

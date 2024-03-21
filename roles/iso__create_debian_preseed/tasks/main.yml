@@ -1,0 +1,29 @@
+---
+- name: Register ssh pub key '{{ iso__create_debian_preseed__ssh_pub_key_file_path }}'
+  ansible.builtin.shell: >-
+    echo "$(cat {{ iso__create_debian_preseed__ssh_pub_key_file_path }})"
+  register: iso__create_debian_preseed__ssh_pub_key
+  changed_when: true
+
+- name: Create preseed dir '{{ iso__create_debian_preseed__scripts_dir_path }}'
+  ansible.builtin.file:
+    path: "{{ iso__create_debian_preseed__scripts_dir_path }}"
+    state: directory
+
+- name: Copy templates to '{{ iso__create_debian_preseed__scripts_dir_path }}'
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ iso__create_debian_preseed__scripts_dir_path }}/{{ file_name }}"
+  with_fileglob: "templates/*.j2"
+  vars:
+    file_name: "{{ item | basename | regex_replace('\\.j2$', '') }}"
+
+- name: >-
+    Build debian iso 
+    '{{- iso__create_debian_preseed__debian_architecture -}}
+    -{{ iso__create_debian_preseed__debian_version }}'
+  ansible.builtin.command: >-
+    chdir={{ iso__create_debian_preseed__scripts_dir_path }}
+    docker build --file Dockerfile
+    --output {{ iso__create_debian_preseed__iso_dir_path }} .
+  changed_when: true

@@ -1,0 +1,7 @@
+caddy__add_site__sub_configs_dir_path: null
+caddy__add_site__file_name: null
+
+caddy__add_site__container_name: "caddy"
+
+caddy__add_site__tls_enabled: false
+caddy__add_site__domain_name: null

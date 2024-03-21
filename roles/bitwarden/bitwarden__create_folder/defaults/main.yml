@@ -1,0 +1,3 @@
+create_bitwarden__folder__folder_name: null # home
+create_bitwarden__folder__folder_parent: null # private/server
+create_bitwarden__folder__result_folder_id: null # uuid

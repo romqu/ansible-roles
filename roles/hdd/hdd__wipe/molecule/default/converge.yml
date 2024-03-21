@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: "Include wipe_hard_drives"
+      ansible.builtin.include_role:
+        name: "wipe_hard_drives"

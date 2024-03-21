@@ -1,0 +1,13 @@
+- name: Reload systemd
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+  listen: "enable timer"
+
+- name: Enable systemd timer
+  become: true
+  ansible.builtin.systemd:
+    name: "{{ systemd__create_timer__file }}"
+    enabled: true
+    state: started
+  listen: "enable timer"

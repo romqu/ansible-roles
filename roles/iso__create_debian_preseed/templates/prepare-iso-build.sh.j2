@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+mkdir iso
+mkdir newiso
+xorriso -osirrox on -indev debian.iso -extract / iso
+cp -rT ./iso/ ./newiso/
+chmod +w -R ./newiso/install.{{ iso__create_debian_preseed__architecture }}/
+gunzip ./newiso/install.{{ iso__create_debian_preseed__architecture }}/initrd.gz

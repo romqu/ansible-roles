@@ -1,0 +1,84 @@
+---
+- name: Create dir {{ vm__start_debian__vm_tmp_files_dir_path }}
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ vm__start_debian__vm_tmp_dir_path }}"
+    - "{{ vm__start_debian__vm_tmp_scripts_dir_path }}"
+
+- name: Copy files from {{ vm__start_debian__vm_persistent_dir_path }} to {{ vm__start_debian__vm_tmp_files_dir_path }}
+  ansible.builtin.copy:
+    src: "{{ vm__start_debian__vm_persistent_dir_path }}/"
+    dest: "{{ vm__start_debian__vm_tmp_files_dir_path }}"
+    force: false
+
+- name: Register vm hdds
+  ansible.builtin.include_role:
+    name: "../roles/shared_tasks"
+    tasks_from: register_vm_hdds
+  vars:
+    vm__hdd_image_name: "{{ vm__start_debian__hdd_image_name }}"
+    vm__hdd_image_format: "{{ vm__start_debian__hdd_image_format }}"
+    vm__hdd_image_quantity: "{{ vm__start_debian__hdd_image_quantity }}"
+
+- name: Copy start_vm template to {{ vm__start_debian__vm_tmp_scripts_dir_path }}
+  ansible.builtin.template:
+    src: "{{ file_name }}.j2"
+    dest: "{{ vm__start_debian__vm_tmp_scripts_dir_path }}/{{ file_name }}"
+    mode: "0755"
+  vars:
+    ansible_distribution_lower: "{{ ansible_distribution | lower }}"
+    file_name: "start_vm_{{ ansible_distribution_lower }}"
+
+- name: Reset known hosts for {{ vm__start_debian__vm__hostname }}
+  ansible.builtin.command: ssh-keygen -R {{ vm__start_debian__vm__hostname }}
+  changed_when: true
+
+- name: Kill old vm
+  ansible.builtin.command: pkill qemu
+  become: "{{ vm__start_debian__become }}"
+  ignore_errors: true
+
+- name: Allow qemu to bind ports < 1024
+  ansible.builtin.command: setcap CAP_NET_BIND_SERVICE+ep /usr/bin/qemu-system-x86_64 
+  become: "{{ vm__start_debian__become }}"
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Start debian vm
+  ansible.builtin.command: "{{ vm__start_debian__vm_tmp_scripts_dir_path }}/{{ file_name }}"
+  become: "{{ vm__start_debian__become }}"
+  vars:
+    ansible_distribution_lower: "{{ ansible_distribution | lower }}"
+    file_name: "start_vm_{{ ansible_distribution_lower }}"
+  changed_when: true
+
+- name: Do when encrypted
+  when: vm__start_debian__is_encrypted
+  block:
+    - name: Wait for startup
+      ansible.builtin.include_tasks: "../roles/shared_tasks/tasks/wait_for_initramfs_ssh.yml"
+      vars:
+        shared_tasks__wait_for_ssh__host: "{{ vm__start_debian__ssh_dropbear_root_host }}"
+        shared_tasks__wait_for_ssh__delay: 5
+        shared_tasks__wait_for_ssh__retries: 10
+
+    - name: Reset known hosts for {{ vm__start_debian__vm__hostname }}
+      command: ssh-keygen -R {{ vm__start_debian__vm__hostname }}
+
+    - name: Unlock encrypted volume
+      ansible.builtin.include_tasks: "../roles/shared_tasks/tasks/unlock_encrypted_volume.yml"
+      vars:
+        unlock_encrypted_volume__ssh_password: "{{ vm__start_debian__ssh_dropbear_root_password }}"
+        unlock_encrypted_volume__ssh_host: "{{ vm__start_debian__ssh_dropbear_root_host }}"
+        unlock_encrypted_volume__crypt_password: "{{ vm__start_debian__crypt_password }}"
+
+    - name: Reset known hosts for {{ vm__start_debian__vm__hostname }}
+      ansible.builtin.command: ssh-keygen -R {{ vm__start_debian__vm__hostname }}
+
+- name: Wait for ssh
+  ansible.builtin.wait_for:
+    port: "{{ vm__start_debian__ssh_port }}"
+    host: "{{ vm__start_debian__vm__hostname }}"
+    search_regex: OpenSSH
+    delay: 5

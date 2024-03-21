@@ -1,0 +1,28 @@
+services:
+  restic:
+    hostname: server
+    container_name: restic-server
+    build:
+      context: .
+      args:
+        AWS_ACCESS_KEY_ID: "{{ restic__docker_setup__aws_access_key_id }}"
+        AWS_SECRET_ACCESS_KEY: "{{ restic__docker_setup__aws_secret_access_key }}"
+        RESTIC_PASSWORD: "{{ restic__docker_setup__restic_password }}"
+    volumes:
+      - type: volume
+        source: cache
+        target: "/root/.cache"
+      - type: bind
+        source: "{{ restic__docker_setup__backup_folder_path_host }}"
+        target: "{{ restic__docker_setup__backup_folder_path_container }}"
+        read_only: true
+{% for dict_item in restic__docker_setup__repo_local_dict %}
+      - type: bind
+        source: "{{ dict_item["repo"] }}"
+        target: "{{ dict_item["repo"] }}"
+{% endfor -%}
+
+volumes:
+  cache:
+
+# sudo docker compose exec restic ash

@@ -1,0 +1,22 @@
+---
+- name: Make sure dirs exists
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ caddy__docker_setup__dir_path }}"
+    - "{{ caddy__docker_setup__sub_configs_dir_path }}"
+    - "{{ caddy__docker_setup__data_backup_dir_path }}"
+
+- name: Copy templates
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ caddy__docker_setup__dir_path }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
+  with_fileglob: 
+    - "templates/*.j2"
+
+- name: Start caddy container
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: "{{ caddy__docker_setup__dir_path }}"
+    state: present

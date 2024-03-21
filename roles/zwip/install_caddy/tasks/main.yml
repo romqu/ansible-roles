@@ -1,0 +1,29 @@
+---
+- name: create caddy dir
+  file:
+    path: /opt/caddy
+    state: directory
+    mode: "0755"
+
+- name: copy files
+  copy:
+    src: "{{ item }}"
+    dest: "/opt/caddy/{{ item | replace('.' + env, '') }}"
+    mode: "0755"
+  loop: [ "Caddyfile.{{ env }}", "docker-compose.yml" ]
+
+- name: create web network
+  community.docker.docker_network:
+    name: web
+
+- name: create caddy volumes
+  community.docker.docker_volume:
+    name: "{{ item }}"
+  loop: [ "caddy_data", "caddy_config" ]
+
+- name: deploy compose
+  docker_compose:
+    project_src: /opt/caddy/
+    restarted: yes
+    files:
+      - docker-compose.yml

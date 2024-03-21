@@ -1,0 +1,126 @@
+---
+- name: Install packages
+  become: "{{ vm__setup_debian__become }}"
+  ansible.builtin.apt:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - qemu-kvm
+      - bridge-utils
+      - socat
+      - 7zip
+
+- name: Install python packages
+  ansible.builtin.pip:
+    name: "{{ packages }}"
+    virtualenv: "{{ vm__setup_debian__pip_virtualenv }}"
+  vars:
+    packages:
+      - bcrypt
+      - cryptography
+      - passlib
+
+- name: Create dirs
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ vm__setup_debian__scripts_dir_path }}"
+    - "{{ vm__setup_debian__files_dir_path }}"
+    - "{{ vm__setup_debian__iso_dir_path }}"
+
+- name: Create image '{{ vm__setup_debian__image_file }}'
+  ansible.builtin.command: >-
+    qemu-img create -f qcow2 {{ vm__setup_debian__image_file  }}
+    {{ vm__setup_debian__image_size }}
+  args:
+    chdir: "{{ vm__setup_debian__files_dir_path }}"
+
+- name: Register vm hdds
+  ansible.builtin.include_role:
+    name: "../roles/shared_tasks"
+    tasks_from: register_vm_hdds
+  vars:
+    vm__hdd_image_name: "{{ vm__setup_debian__hdd_image_name }}"
+    vm__hdd_image_format: "{{ vm__setup_debian__hdd_image_format }}"
+    vm__hdd_image_quantity: "{{ vm__setup_debian__hdd_image_quantity }}"
+
+- name: Create {{ vm__setup_debian__hdd_image_quantity }} hdd image(s)
+  ansible.builtin.command: qemu-img create -f qcow2 {{ item }} {{ vm__setup_debian__hdd_image_size }}
+  args:
+    chdir: "{{ vm__setup_debian__files_dir_path }}"
+  loop: "{{ vm__hdd_image_files__result }}"
+  changed_when: true
+
+- name: Install preseeded debian vm
+  become: "{{ vm__setup_debian__become }}"
+  changed_when: true
+  ansible.builtin.shell:
+    cmd: >-
+      qemu-system-x86_64 \
+          -enable-kvm \
+          -nodefaults \
+          -no-reboot \
+          -bios '/usr/share/qemu/OVMF.fd' \
+          -serial null -parallel null -monitor none -display none -vga none \
+          -monitor unix:{{ vm__setup_debian__qemu_monitor_socket_path }},server,nowait \
+          \
+          -smp 2 \
+          -cpu host \
+          -m 2048 \
+          \
+          -netdev user,id=net0,net={{ vm__setup_debian__vm_net }},dhcpstart={{ vm__setup_debian__vm_dhcp_start_address }} \
+          -device virtio-net-pci,netdev=net0 \
+          \
+          -drive file={{ vm__setup_debian__vm_tmp_image_file_path }},format={{ vm__setup_debian__vm_image_format }},if=none,id=drive0 \
+          -device virtio-blk-pci,drive=drive0,id=virtblk0 \
+          \
+          -drive if=none,id=stick,format=raw,file="{{ vm__setup_debian__vm_tmp_iso_file_path }}" \
+          -device nec-usb-xhci,id=xhci \
+          -device usb-storage,bus=xhci.0,drive=stick
+
+- name: Reset known hosts for {{ vm__setup_debian__vm_ip }}
+  ansible.builtin.command: ssh-keygen -R {{ vm__setup_debian__vm_ip }}
+  changed_when: true
+
+- name: Extract kernel and initrd
+  community.general.iso_extract:
+    executable: 7zz
+    image: "{{ item.image }}"
+    dest: "{{ item.dest }}"
+    files:
+      - "{{ item.file }}"
+  loop:
+    - {
+        image: "{{ vm__setup_debian__vm_tmp_image_file_path }}",
+        file: "{{ vm__setup_debian__extract_img_name }}",
+        dest: "{{ vm__setup_debian__vm_tmp_dir_path }}",
+      }
+    - {
+        image: "{{ vm__setup_debian__extract_img_file_path }}",
+        file: "{{ vm__setup_debian__extract_kernel_img_file }}",
+        dest: "{{ vm__setup_debian__files_dir_path }}",
+      }
+    - {
+        image: "{{ vm__setup_debian__extract_img_file_path }}",
+        file: "{{ vm__setup_debian__extract_initrd_img_file }}",
+        dest: "{{ vm__setup_debian__files_dir_path }}",
+      }
+
+- name: Clear {{ vm__setup_debian__vm_persistent_dir_path }}
+  ansible.builtin.file:
+    state: "{{ item }}"
+    path: "{{ vm__setup_debian__vm_persistent_dir_path }}"
+  loop:
+    - absent
+    - directory
+
+- name: Move files to {{ vm__setup_debian__vm_persistent_dir_path }}
+  ansible.builtin.shell: "mv -f {{ vm__setup_debian__files_dir_path }}/* {{ vm__setup_debian__vm_persistent_dir_path }}"
+  changed_when: true
+
+- name: Delete conten from '{{ vm__setup_debian__vm_tmp_dir_path }}''
+  ansible.builtin.file:
+    path: "{{ vm__setup_debian__vm_tmp_dir_path }}"
+    state: absent

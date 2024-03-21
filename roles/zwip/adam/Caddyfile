@@ -1,0 +1,3 @@
+http://evcc.home {
+	reverse_proxy http://172.17.0.2:7070
+}

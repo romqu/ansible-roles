@@ -1,0 +1,13 @@
+---
+- name: Copy caddy site template
+  ansible.builtin.template:
+    src: "site.Caddyfile.j2"
+    dest: "{{ caddy__add_site__sub_configs_dir_path }}/{{ caddy__add_site__file_name }}"
+
+- name: Reload caddy
+  become: true
+  community.docker.docker_container_exec:
+    container: "{{ caddy__add_site__container_name }}"
+    command: "caddy reload"
+    chdir: "/etc/caddy"
+  register: result

@@ -1,0 +1,20 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: delegated
+  options:
+    managed: False
+    login_cmd_template: 'ssh test_vm_01'
+    ansible_connection_options:
+      connection: ssh
+      ansible_ssh_common_args: ""
+platforms:
+  - name: vm
+provisioner:
+  name: ansible
+  inventory:
+    links:
+      group_vars: ../../../../group_vars
+verifier:
+  name: ansible

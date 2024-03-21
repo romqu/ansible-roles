@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include get_bitwarden__field"
+      include_role:
+        name: "get_bitwarden__field"

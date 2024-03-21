@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include create_backup_dirs"
+      include_role:
+        name: "create_backup_dirs"

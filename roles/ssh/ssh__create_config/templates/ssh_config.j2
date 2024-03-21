@@ -1,0 +1,19 @@
+Host {{ ssh__create_config__host }}
+    HostName {{ ssh__create_config__host_name }}
+    User {{ ssh__create_config__user }}
+    Port {{ ssh__create_config__port }}
+    IdentityFile {{ ssh__create_config__identity_file_path }}
+{% if ssh__create_config__accept_new %}
+    StrictHostKeyChecking=accept-new
+{% endif %}
+
+{% if ssh__create_config__add_root -%}
+Host {{ ssh__create_config__host_root }}
+    HostName {{ ssh__create_config__host_name }}
+    User root
+    Port {{ ssh__create_config__port }}
+    IdentityFile {{ ssh__create_config__identity_file_path }}
+{% if ssh__create_config__accept_new %}
+    strictHostKeyChecking=accept-new
+{% endif -%}
+{% endif %}

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+cp grub.cfg newiso/boot/grub/
+echo preseed.cfg | cpio -H newc -o -A -F ./newiso/install.{{ iso__create_debian_preseed__architecture }}/initrd
+gzip ./newiso/install.{{ iso__create_debian_preseed__architecture }}/initrd
+chmod -w -R ./newiso/install.{{ iso__create_debian_preseed__architecture }}
+chmod +w ./newiso/md5sum.txt
+#find -follow -type f ! -name md5sum.txt -print0 | xargs -0 md5sum > ./newiso/md5sum.txt
+
+find -follow -type f -exec md5sum {} \; > ./newiso/md5sum.txt
+chmod -w ./newiso/md5sum.txt
+xorriso -as mkisofs -r -J \
+    -joliet-long \
+    -cache-inodes \
+    -e boot/grub/efi.img \
+    -no-emul-boot \
+    -append_partition 2 0xef newiso/boot/grub/efi.img \
+    -partition_cyl_align all \
+    -isohybrid-gpt-basdat \
+    -o ./{{ iso__create_debian_preseed__iso_name }} newiso/

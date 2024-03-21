@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include start_docker_desktop"
+      include_role:
+        name: "start_docker_desktop"

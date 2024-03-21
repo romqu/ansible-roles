@@ -1,0 +1,20 @@
+systemd__create_timer__file_name: "ansible_timer"
+systemd__create_timer__file_ext_name: "timer"
+systemd__create_timer__dir_path: "/etc/systemd/system"
+systemd__create_timer__file: >-
+  {{ systemd__create_timer__file_name
+    + '.'
+    + systemd__create_timer__file_ext_name
+  }}
+systemd__create_timer__file_path: >-
+  {{ systemd__create_timer__dir_path
+    + '/'
+    + systemd__create_timer__file
+  }}
+
+systemd__create_timer__description: "ansible_timer"
+systemd__create_timer__unit: "ansible_service.service"
+systemd__create_timer__on_calendar: "*-*-* 12:00:00"
+systemd__create_timer__on_boot_sec: "5min"
+systemd__create_timer__on_unit_active_sec: "6h"
+systemd__create_timer__wanted_by: "timers.target"

@@ -1,0 +1,23 @@
+FROM instrumentisto/restic
+
+ARG AWS_ACCESS_KEY_ID
+ENV AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
+
+ARG AWS_SECRET_ACCESS_KEY
+ENV AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY
+
+ARG RESTIC_PASSWORD
+ENV RESTIC_PASSWORD $RESTIC_PASSWORD
+
+RUN apk add --no-cache bash
+RUN apk add --no-cache curl
+
+WORKDIR "/root"
+RUN mkdir cache
+
+ADD --chmod=0755 restic-init.sh .
+ADD --chmod=0755 restic-backup.sh .
+
+ENTRYPOINT []
+CMD ./restic-init.sh && ./restic-backup.sh
+

@@ -1,0 +1,10 @@
+- name: Wait for initramfs ssh '{{ shared_tasks__wait_for_ssh__host }}'
+  ansible.builtin.command: >-
+    ssh -o BatchMode=yes -o ConnectTimeout=3 -o PubkeyAuthentication=no 
+    -o PasswordAuthentication=no -o KbdInteractiveAuthentication=no 
+    -o ChallengeResponseAuthentication=no {{ shared_tasks__wait_for_ssh__host }} 2>&1
+  register: cmd_result
+  retries: "{{ shared_tasks__wait_for_ssh__retries }}"
+  delay: "{{ shared_tasks__wait_for_ssh__delay }}"
+  until: "'Host key verification failed' in cmd_result.stderr or 'Permission denied' in cmd_result.stderr"
+  failed_when: false

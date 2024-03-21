@@ -1,0 +1,6 @@
+debian_vm_initrd_img_file_path: "{{ debian_vm_tmp_files_dir_path }}/{{ debian_vm_initrd_img_name }}"
+debian_vm_kernel_img_file_path: "{{ debian_vm_tmp_files_dir_path }}/{{ debian_vm_kernel_img_name }}"
+
+debian_vm_dhcp_start_address: "10.0.2.1"
+debian_vm_dhcp_end_address: "10.0.2.3"
+debian_vm_dhcp_subnet_mask: "255.255.255.0"

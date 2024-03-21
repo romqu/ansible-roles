@@ -1,0 +1,9 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include delete_user"
+      include_role:
+        name: "delete_user"
+      vars:
+        - delete_user_name: "test"

@@ -1,0 +1,11 @@
+[Unit]
+Description={{ systemd__create_service__description }}
+
+[Service]
+Type={{ systemd__create_service__type }}
+ExecStart={{ systemd__create_service__exec_start }}
+User={{ systemd__create_service__user }}
+Group={{ systemd__create_service__group }}
+
+[Install]
+WantedBy={{ systemd__create_service__wanted_by }}

@@ -1,0 +1,11 @@
+---
+- name: Make sure dir exists - {{ restic__docker_setup__dir_path }}
+  ansible.builtin.file:
+    path: "{{ restic__docker_setup__dir_path }}"
+    state: directory
+
+- name: Copy templates
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ restic__docker_setup__dir_path }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
+  with_fileglob: "templates/*.j2"

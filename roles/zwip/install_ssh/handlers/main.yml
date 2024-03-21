@@ -1,0 +1,7 @@
+---
+- name: enable-ssh
+  become: true
+  service:
+    name: sshd
+    enabled: yes
+    state: started

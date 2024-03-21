@@ -1,0 +1,20 @@
+---
+- name: Run when at least one drive found
+  when: luks__open__drives | length > 0
+  become: true
+  block:
+    - name: Set fact disks_with_partition_name
+      ansible.builtin.set_fact:
+        luks__open__disks_with_partition_name: |
+          {{ luks__open__disks_with_partition_name|default([])
+            + [ {'disk_name': item, 'partition_name': item + "0" } ] }}
+      loop: "{{ luks__open__drives }}"
+
+    - name: Open '{{ luks__open__drives }}'
+      community.crypto.luks_device:
+        device: "/dev/{{ item.disk_name }}"
+        state: "opened"
+        name: "{{ item.partition_name }}"
+        keyfile: "{{ luks__open__keyfile_path }}"
+      loop: "{{ luks__open__disks_with_partition_name }}"
+

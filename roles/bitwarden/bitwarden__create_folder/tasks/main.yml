@@ -1,0 +1,12 @@
+---
+- name: Create folder
+  bitwarden_create:
+    type: folder
+    name: "{{ bitwarden__create_folder__folder_name }}"
+    parent: "{{ bitwarden__create_folder__folder_parent }}"
+  register: bitwarden__create_folder__result
+
+- name: Set 'bitwarden__create_folder__result_folder_id' fact
+  ansible.builtin.set_fact:
+    bitwarden__create_folder__result_folder_id: "{{ bitwarden__create_folder__result.folder_id }}"
+

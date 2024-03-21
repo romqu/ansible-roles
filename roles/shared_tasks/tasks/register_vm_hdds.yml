@@ -1,0 +1,11 @@
+- name: >- 
+    register '{{ vm__hdd_image_quantity }}' hdd images(s)
+    as 'vm__hdd_image_files__result'
+  ansible.builtin.set_fact:
+    vm__hdd_image_files__result: "{{ appended }}"
+  loop: "{{ range(0, vm__hdd_image_quantity | int, 1) | list }}"
+  vars:
+    image_file: 
+      "{{ vm__hdd_image_name }}_{{ item }}.{{ vm__hdd_image_format }}"
+    appended: "{{ vm__hdd_image_files__result | default([]) + [image_file] }}"
+    

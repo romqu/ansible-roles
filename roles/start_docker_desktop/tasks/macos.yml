@@ -1,0 +1,10 @@
+---
+- name: Start Docker Desktop
+  ansible.builtin.shell: osascript -e "tell application \"Docker Desktop\" to activate"
+
+- name: Wait for Docker
+  command: docker info
+  register: docker_info_result
+  delay: 5
+  retries: 10
+  until: '"ERROR" not in docker_info_result.stdout'

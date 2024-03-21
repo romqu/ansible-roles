@@ -1,0 +1,8 @@
+bitwarden__update_items__type: "login"
+bitwarden__update_items__type_login_data: [
+  { },
+  # {
+  #   "name": "9999",
+  #   "changes": [{ "name": "1111"}, { "password": "1111"}],
+  # },
+]

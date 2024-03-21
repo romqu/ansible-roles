@@ -1,0 +1,18 @@
+immich__docker_setup__immich_version: "v1.95.1"
+
+immich__docker_setup__user_id: null
+immich__docker_setup__group_id: null
+
+immich__docker_setup__config_file_path: null
+
+immich__docker_setup__postgres_db_password: null
+immich__docker_setup__postgres_backup_dir_path: null
+
+immich__docker_setup__upload_dir_path: null
+immich__docker_setup__library_dir_path: null
+immich__docker_setup__thumbs_dir_path: null
+immich__docker_setup__profile_dir_path: null
+immich__docker_setup__encoded_video_dir_path: null
+
+immich__docker_setup__ports_host_ip: "127.0.0.1"
+

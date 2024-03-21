@@ -1,0 +1,15 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include vm__start_debian"
+      include_role:
+        name: "vm__start_debian"
+      vars:
+        - debian_vm_hdd_image_files: {
+          'results': [
+            'stdout': '{{ debian_vm_hdd_image_name  }}_0.qcow2',
+            'stdout': '{{ debian_vm_hdd_image_name  }}_1.qcow2',
+          ]
+        }
+        - vm__start_debian__become: false

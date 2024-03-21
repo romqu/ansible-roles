@@ -1,0 +1,79 @@
+#!/bin/bash
+set -o nounset
+set -o pipefail
+
+readonly pushover_user_key="{{ restic__docker_setup__pushover_user_key }}"
+readonly pushover_token="{{ restic__docker_setup__pushover_token }}"
+
+readonly backup_folder_path="{{ restic__docker_setup__backup_folder_path_container }}"
+
+declare -rA repo_map=(
+{% for dict_item in restic__docker_setup__repo_dict %}
+      ["{{ dict_item["repo"] }}"]="{{ dict_item["forget_args"] }}"
+{% endfor -%}
+)
+
+backup_repo() {
+    declare -r repo=$1
+    declare -r backup_result=$(restic --repo "${repo}" backup "${backup_folder_path}" | tail -1)
+
+    echo "Backup ${repo}: ${backup_result}"
+}
+
+prune_repo() {
+    declare -r repo=$1
+    declare -r forget_args_string=$2
+    IFS=' ' read -ra forget_args <<<"${forget_args_string}"
+    declare -r args=(--repo "${repo}" forget "${forget_args[@]}" --prune)
+    declare -r prune_result=$(restic "${args[@]}" | tail -1)
+
+    echo "Prune ${repo}: ${prune_result}"
+}
+
+verify_repo_structure() {
+    declare -r repo=$1
+    restic --repo "${repo}" unlock
+    declare -r verify_structure_result=$(restic --repo "${repo}" check | tail -1)
+
+    echo "Verify ${repo}: ${verify_structure_result}"
+}
+
+send_notification() {
+    declare -r message="$1"
+    curl -s \
+        --form-string "token=${pushover_token}" \
+        --form-string "user=${pushover_user_key}" \
+        --form-string "message=${message}" \
+        https://api.pushover.net/1/messages.json
+}
+
+backup_all_repos() {
+    for repo in "${!repo_map[@]}"; do
+        notification_message=""
+
+        backup_result=$(backup_repo "${repo}")
+
+        forget_args_string="${repo_map[${repo}]}"
+        prune_result=$(prune_repo "$repo" "${forget_args_string}")
+        
+        verify_structure_result=$(verify_repo_structure "$repo")
+
+        notification_message+="$backup_result"
+        notification_message+=$'\n'
+        notification_message+="------------------------------------------"
+        notification_message+=$'\n'
+        notification_message+="$prune_result"
+        notification_message+=$'\n'
+        notification_message+="------------------------------------------"
+        notification_message+=$'\n'
+        notification_message+="$verify_structure_result"
+        send_notification "$notification_message"
+    done
+}
+
+main() {
+    backup_all_repos
+    #send_notification "$notification_message"
+}
+
+main "$@"

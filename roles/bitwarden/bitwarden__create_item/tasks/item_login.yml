@@ -1,0 +1,14 @@
+---
+- name: Create item
+  bitwarden_create:
+    type: "item"
+    name: "{{ bitwarden__create_item__item_name }}"
+    username: "{{ bitwarden__create_item__item_username }}"
+    password: "{{ bitwarden__create_item__item_password }}"
+    folder_name: "{{ bitwarden__create_item__item_folder_name }}"
+    folder_id: "{{ bitwarden__create_item__item_folder_id }}"
+  register: bitwarden__create_item__result
+
+- name: Set 'bitwarden__create_item__result_item_id'
+  ansible.builtin.set_fact:
+    bitwarden__create_item__result_item_id: "{{ bitwarden__create_item__result.item_id }}" 

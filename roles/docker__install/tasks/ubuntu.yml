@@ -1,0 +1,4 @@
+---
+- name: Delegate to debian task
+  ansible.builtin.include_tasks: "debian.yml"
+      

@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+qemu-system-x86_64 \
+-bios '/usr/share/qemu/OVMF.fd' \
+-daemonize \
+-nodefaults \
+-serial null -parallel null -monitor none -display none -vga none \
+-initrd {{ vm__start_debian__vm_initrd_img_file_path }} \
+-kernel {{ vm__start_debian__vm_kernel_img_file_path }} \
+{% if  vm__start_debian__is_encrypted %}
+    -append "root=/dev/mapper/primary-root noresume" \
+{% else %}
+    -append "root=/dev/vda2 noresume" \
+{% endif %}
+\
+-enable-kvm \
+-m 2048 \
+-cpu host \
+-smp 2 \
+\
+-netdev user,id=net0,net={{ vm__start_debian__vm_net }},dhcpstart={{ vm__start_debian__vm_dhcp_start_address }},hostfwd=tcp::22-:22,hostfwd=tcp::2283-:2283 \
+-device virtio-net-pci,netdev=net0 \
+\
+-drive id=drive0,file={{ vm__start_debian__vm_tmp_image_file_path }},format={{ vm__start_debian__vm_image_format }},if=none \
+-device virtio-scsi-pci,id=scsi0 \
+-device scsi-hd,drive=drive0,rotation_rate=1,bus=scsi0.0 \
+{% for item in vm__hdd_image_files__result %}
+    \
+    -drive id=disk{{ loop.index }},file={{ vm__start_debian__vm_files_dir_path }}/{{ item }},if=none \
+    -device ahci,id=ahci{{ loop.index }} \
+    -device ide-hd,drive=disk{{ loop.index }},bus=ahci{{ loop.index }}.0 \
+{% endfor %}

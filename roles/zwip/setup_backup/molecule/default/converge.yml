@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include setup_backup"
+      include_role:
+        name: "setup_backup"
+      vars:
