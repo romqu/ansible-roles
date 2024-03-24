@@ -1,0 +1,4 @@
+zfs__install__debian_backports_uri: "https://deb.debian.org/debian"
+zfs__install__debian_backports_components:
+  "main non-free non-free-firmware contrib"
+

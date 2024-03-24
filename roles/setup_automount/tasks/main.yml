@@ -31,13 +31,13 @@
         regexp: "{{ crypttab_line }}"
       loop: "{{ setup_automount__disks_with_uuid }}"
       vars:
-        crypttab_line: >
+        crypttab_line: >-
           {{ item.partition_name }} UUID={{ item.uuid }}
           {{ setup_automount__keyfile_file_path }} noauto,nofail
 
     - name: Set fact setup_automount__disks_mount_dir_paths
       ansible.builtin.set_fact:
-        setup_automount__disks_mount_dir_paths: |
+        setup_automount__disks_mount_dir_paths: >-
           {{ setup_automount__disks_mount_dir_paths|default([])
           + [setup_automount__mount_dir_path + "/" + item.partition_name] }}
       loop: "{{ setup_automount__disks_with_uuid }}"
@@ -60,7 +60,7 @@
         create: true
       loop: "{{ setup_automount__disks_with_uuid }}"
       vars:
-        fstab_line: >
+        fstab_line: >-
           /dev/mapper/{{ item.partition_name }}
           {{ setup_automount__mount_dir_path }}/{{ item.partition_name }}
           {{ setup_automount__partition_filesystem }}
@@ -69,7 +69,7 @@
 
     - name: Set fact 'setup_automount__handler__load_automount'
       ansible.builtin.set_fact:
-        setup_automount__handler__load_automount: |
+        setup_automount__handler__load_automount: >-
           {{ setup_automount__handler__load_automount|default([])
           + [setup_automount__mount_dir_name + "-" + item.partition_name + "." + "automount"] }}
       loop: "{{ setup_automount__disks_with_uuid }}"

@@ -1,8 +1,0 @@
----
-- name: Converge
-  hosts: all
-  gather_facts: false
-  tasks:
-    - name: "Include get_hard_drives"
-      ansible.builtin.include_role:
-        name: "get_hard_drives"

@@ -1,0 +1,4 @@
+zfs__create_pool__type: "mirror"
+zfs__create_pool__mirror_name: "tank"
+zfs__create_pool__disk_path_list: []
+zfs__create_pool__mount_path: "/mnt/"

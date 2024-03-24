@@ -1,0 +1,16 @@
+- name: Create mirror for '{{ zfs__create_pool__disk_path_list }}'
+  become: true
+  ansible.builtin.command: >-
+    zfs create {{ zfs__create_pool__mirror_name }}
+    -o ashift=12
+    -o normalization=formD
+    -o compression=lz4
+    -o atime=off
+    -o mountpoint={{ zfs__create_pool__mount_path }}
+    mirror {{ disk_paths }}
+  when:
+    - zfs__create_pool__type == "mirror"
+    - zfs__create_pool__disk_path_list is iterable
+    - (zfs__create_pool__disk_path_list | length) > 1
+  vars:
+    disk_paths: "{{ zfs__create_pool__disk_path_list | join (' ') }}"

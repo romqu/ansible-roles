@@ -1,0 +1,60 @@
+- name: Install additional packages
+  become: true
+  ansible.builtin.apt:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      [
+        "apt-transport-https",
+        "lsb-release",
+        "software-properties-common",
+      ]
+
+
+- name: Add debian backports apt repo
+  become: true
+  ansible.builtin.apt_repository:
+    filename: "debian_{{ ansible_distribution_release }}_backbports"
+    repo: "{{ item }} {{ repo_ }}"
+    state: present
+    update_cache: true
+  loop:
+    - "deb"
+    - "deb-src"
+  vars:
+    repo_: >-
+      {{ zfs__install__debian_backports_uri }}
+      {{ ansible_distribution_release }}-backports
+      {{ zfs__install__debian_backports_components }}
+
+- name: Create zfs apt config
+  become: true
+  ansible.builtin.template:
+    src: 90_zfs.j2
+    dest: /etc/apt/preferences.d/90_zfs
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Install zfs
+  become: true
+  ansible.builtin.apt:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      [
+        "dpkg-dev",
+        "linux-headers-amd64",
+        "linux-image-amd64",
+        "zfs-dkms",
+        "zfs-zed",
+        "zfsutils-linux",
+      ]
+
+- name: Enable zfs module
+  become: true
+  community.general.modprobe:
+    name: zfs
+    state: present

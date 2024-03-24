@@ -1,9 +1,9 @@
 ---
-- name: Wipe {{ hdd__wipe__drives }}
+- name: Wipe {{ hdd__wipe__disk_paths }}
   become: true
-  when: hdd__wipe__drives | length > 0
-  register: hdd__wipe__drives_result
-  ansible.builtin.command: dd if=/dev/zero of=/dev/{{ item }} bs=4096
-  loop: "{{ hdd__wipe__drives }}"
-  changed_when: hdd__wipe__drives | length > 0
-  failed_when: '"No space left on device" not in hdd__wipe__drives_result.stderr'
+  when: hdd__wipe__disk_paths | length > 0
+  register: hdd__wipe__disk_paths_result
+  ansible.builtin.command: dd if=/dev/zero of={{ item }} bs=4096
+  loop: "{{ hdd__wipe__disk_paths }}"
+  changed_when: hdd__wipe__disk_paths | length > 0
+  failed_when: '"No space left on device" not in hdd__wipe__disk_paths_result.stderr'

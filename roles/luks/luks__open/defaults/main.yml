@@ -1,4 +1,4 @@
-luks__open__drives: []
+luks__open__disk_path_list: []
 luks__open__keyfile_path: []
 luks__open__disks_with_partition_name: []
 

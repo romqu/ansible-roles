@@ -1,4 +1,4 @@
-luks__encrypt__drives: []
+luks__encrypt__disk_path_list: []
 luks__encrypt__keyfile_file_name: "2a8b1716-97a3-4a29-b4f8-c429d74cf46f.key"
 luks__encrypt__keyfile_dir_path: "/etc/cryptsetup-keys.d/"
 luks__encrypt__keyfile_file_path: "{{ luks__encrypt__keyfile_dir_path }}{{ luks__encrypt__keyfile_file_name }}"

@@ -15,7 +15,7 @@
     mode: "0400"
 
 - name: Run when at least one drive found
-  when: luks__encrypt__drives | length > 0
+  when: luks__encrypt__disk_path_list | length > 0
   become: true
   block:
     - name: Install cryptsetup
@@ -25,9 +25,9 @@
 
     - name: Create LUKS container with a keyfile
       community.crypto.luks_device:
-        device: "/dev/{{ item }}"
+        device: "{{ item }}"
         state: "present"
         keyfile: "{{ luks__encrypt__keyfile_file_path }}"
         type: "luks2"
         pbkdf: { "algorithm": "argon2id" }
-      loop: "{{ luks__encrypt__drives }}"
+      loop: "{{ luks__encrypt__disk_path_list }}"
