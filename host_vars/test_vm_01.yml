@@ -24,8 +24,8 @@ luks__open__keyfile_path: "{{ luks__encrypt__keyfile_file_path }}"
 
 zfs__create_pool__disk_path_list: "{{ luks__open__disk_path_list_result }}"
 zfs__create_pool__type: "mirror"
-zfs__create_pool__mirror_name: "zdata"
-zfs__create_pool__mount_path: "/mnt"
+zfs__create_pool__pool_name: "zdata"
+zfs__create_pool__mount_path: "/mnt/{{ zfs__create_pool__pool_name }}"
 
 # ##########################################################################################################
 # 
