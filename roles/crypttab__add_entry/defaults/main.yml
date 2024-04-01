@@ -1,0 +1,6 @@
+crypttab__add_entry__disk_data_list: []
+#  - disk_path: ""
+#    partition_path: ""
+#    partition_name: ""
+#    options: []
+crypttab__add_entry__keyfile_file_path: null

@@ -1,40 +1,40 @@
 bitwarden__get_password__result: "{{ lookup('community.general.bitwarden', test_vm__bitwarden__item_name, field='password') | regex_replace(\"^(\\[')(.*)('\\])$\", '\\2') }}"
 
-
 ansible_become_pass: "{{ bitwarden__get_password__result }}"
-
 
 sshd__setup_config__port: "{{ test_vm__ssh_port }}"
 
-
 hdd__wipe__disk_paths: "{{ hdd__get_all__no_partitions_disk_paths_result }}"
-
 
 luks__encrypt__disk_path_list: "{{ hdd__get_all__no_partitions_disk_paths_result }}"
 luks__encrypt__keyfile_file_name: "2a8b1716-97a3-4a29-b4f8-c429d74cf46f.key"
 luks__encrypt__keyfile_dir_path: "/etc/cryptsetup-keys.d/"
-luks__encrypt__keyfile_file_path: 
-  "{{ luks__encrypt__keyfile_dir_path }}{{ luks__encrypt__keyfile_file_name }}"
+luks__encrypt__keyfile_file_path: >-
+  {{ luks__encrypt__keyfile_dir_path }}{{ luks__encrypt__keyfile_file_name }}
 luks__encrypt__passphrase: "{{ bitwarden__get_password__result }}"
-
 
 luks__open__disk_path_list: "{{ hdd__get_all__no_partitions_disk_paths_result }}"
 luks__open__keyfile_path: "{{ luks__encrypt__keyfile_file_path }}"
 
-
-zfs__create_pool__disk_path_list: "{{ luks__open__disk_path_list_result }}"
+zfs__create_pool__disk_path_list: "{{ luks__open__disk_data_list_result[:2] | map(attribute='partition_path') }}"
 zfs__create_pool__type: "mirror"
 zfs__create_pool__pool_name: "zdata"
 zfs__create_pool__mount_path: "/mnt/{{ zfs__create_pool__pool_name }}"
 
+crypttab__add_entry__disk_data_list: >-
+  {{ 
+    luks__open__disk_data_list_result[:2] |
+    map('combine', {'options': ['luks','discard']})
+  }}
+crypttab__add_entry__keyfile_file_path: "{{ luks__encrypt__keyfile_file_path }}"
 # ##########################################################################################################
-# 
-# 
+#
+#
 # format_hard_drives__drives: "{{ hdd__get_all__no_filesystem_result_fact }}"
 # format_hard_drives__partition: "{{ luks__open__disks_with_partition_name | map(attribute='partition_name') }}"
 # format_hard_drives__partition_filesystem: "ext4"
 # format_hard_drives__encrypted: true
-# 
+#
 # setup_automount__disks: "{{ luks__open__disks_with_partition_name }}"
 # setup_automount__keyfile_file_path: "{{ luks__encrypt__keyfile_file_path }}"
 # setup_automount__partition_filesystem: "{{ format_hard_drives__partition_filesystem }}"
@@ -42,12 +42,12 @@ zfs__create_pool__mount_path: "/mnt/{{ zfs__create_pool__pool_name }}"
 # setup_automount__mount_dir_path: "/{{ setup_automount__mount_dir_name }}"
 # setup_automount__disk_mount_dir_owner: "{{ shared__test_vm__username }}"
 # setup_automount__systemd_idle_timeout_sec: 30
-# 
+#
 # create_backup_dirs__disks_mount_dir_paths: ["/mnt/sda0", "/mnt/sdb0"] # "{{ setup_automount__disks_mount_dir_paths }}"
 # create_backup_dirs__dir_name: "backup"
 # create_backup_dirs__backup_dir_owner: "{{ shared__test_vm__username }}"
 # create_backup_dirs__main_dir_marker_file_name: "{{ host_uuid }}
-# 
+#
 # restic__docker_setup__aws_access_key_id: ""
 # restic__docker_setup__aws_secret_access_key: ""
 # restic__docker_setup__restic_password: "a"
@@ -69,7 +69,7 @@ zfs__create_pool__mount_path: "/mnt/{{ zfs__create_pool__pool_name }}"
 #   ]
 # restic__docker_setup__pushover_user_key: ""
 # restic__docker_setup__pushover_token: ""
-# 
+#
 # systemd__create_service__file_name: "restic-backup"
 # systemd__create_service__description: "restic-backup"
 # systemd__create_service__group: "docker"
@@ -80,7 +80,7 @@ zfs__create_pool__mount_path: "/mnt/{{ zfs__create_pool__pool_name }}"
 # systemd__create_timer__description: "{{ systemd__create_service__description + ' timer' }}"
 # systemd__create_timer__unit: "{{ systemd__create_service__file }}"
 # systemd__create_timer__on_calendar: "*-*-* 12:00:00"
-# 
+#
 # immich__docker_setup__dir_path: "/home/roman/docker/immich/"
 # immich__docker_setup__config_file_path: "/home/roman/docker/immich/immich.config"
 # immich__docker_setup__postgres_db_password: "a"
@@ -93,7 +93,7 @@ zfs__create_pool__mount_path: "/mnt/{{ zfs__create_pool__pool_name }}"
 # immich__docker_setup__ports_host_ip: "0.0.0.0"
 # immich__docker_setup__user_id: "{{ ansible_facts.user_uid }}"
 # immich__docker_setup__group_id: "{{ ansible_facts.user_gid }}"
-# 
+#
 # caddy__docker_setup__dir_path: "/home/roman/docker/caddy/"
 # caddy__docker_setup__data_backup_dir_path: "/home/roman/docker/caddy/backup"
 # caddy__docker_setup__sub_configs_dir_name: "conf.d"
@@ -105,7 +105,7 @@ zfs__create_pool__mount_path: "/mnt/{{ zfs__create_pool__pool_name }}"
 # caddy__add_site__file_name: "test"
 # caddy__add_site__tls_enabled: false
 # caddy__add_site__domain_name: ""
-# 
+#
 # tailscale__docker_setup__dir_path: "/home/roman/docker/tailscale/"
-# tailscale__docker_setup__auth_key: 
+# tailscale__docker_setup__auth_key:
 #   ""

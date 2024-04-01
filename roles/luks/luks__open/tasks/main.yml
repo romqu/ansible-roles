@@ -25,13 +25,19 @@
         keyfile: "{{ luks__open__keyfile_path }}"
       loop: "{{ luks__open__disks_with_partition_name }}"
 
-    - name: Return disk paths as 'luks__open__disk_path_list_result'
+    - name: Return disk paths with partition as 'luks__open__disk_data_list_result'
       ansible.builtin.set_fact:
-        luks__open__disk_path_list_result: "{{ appended }}"
+        luks__open__disk_data_list_result: "{{ appended }}"
       loop: "{{ luks__open__disks_with_partition_name }}"
       vars:
         appended: >-
           {{
-              luks__open__disk_path_list_result | default([]) +
-              ["/dev/mapper/" + item.partition_name]
+              luks__open__disk_data_list_result | default([]) +
+              [
+                {
+                "disk_path": item.disk_path,
+                "partition_path": "/dev/mapper/" + item.partition_name,
+                "partition_name": item.partition_name
+                }
+              ]
           }}
