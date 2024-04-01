@@ -1,0 +1,16 @@
+---
+- name: Run when at least one drive found
+  when:
+    - hdd__create_filesystem__disk_data | length > 0
+  become: true
+  block:
+    - name: Install parted
+      ansible.builtin.apt:
+        name: parted
+        state: present
+
+    - name: Create filesystem for {{ item.disk_path }}
+      community.general.filesystem:
+        fstype: "{{ item.filesystem_type }}"
+        dev: "{{ item.disk_path }}"
+      loop: "{{ hdd__create_filesystem__disk_data }}"

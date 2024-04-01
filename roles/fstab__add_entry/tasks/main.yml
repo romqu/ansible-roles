@@ -4,37 +4,6 @@
     - setup_automount__disks | length > 0
   become: true
   block:
-    - name: Register uuid for disks
-      ansible.builtin.shell: >
-        lsblk -l -o NAME,UUID |
-        grep -m 1 {{ item.disk_name }} |
-        awk '{ print $2 }'
-      register: setup_automount__disks_uuid_results
-      loop: "{{ setup_automount__disks }}"
-      changed_when: true
-
-    - name: Add disk uuids to data with fact 'setup_automount__disks_with_uuid'
-      ansible.builtin.set_fact:
-        setup_automount__disks_with_uuid: "{{ appended }}"
-      loop: "{{ setup_automount__disks_uuid_results.results }}"
-      loop_control:
-        index_var: index
-      vars:
-        disk_data: "{{ setup_automount__disks[index] }}"
-        combined: "{{ disk_data | combine({'uuid': item.stdout}) }}"
-        appended: "{{ setup_automount__disks_with_uuid | default([]) + [combined] }}"
-
-    - name: Add crypttab entry for {{ setup_automount__disks }}
-      ansible.builtin.lineinfile:
-        path: /etc/crypttab
-        line: "{{ crypttab_line }}"
-        regexp: "{{ crypttab_line }}"
-      loop: "{{ setup_automount__disks_with_uuid }}"
-      vars:
-        crypttab_line: >-
-          {{ item.partition_name }} UUID={{ item.uuid }}
-          {{ setup_automount__keyfile_file_path }} noauto,nofail
-
     - name: Set fact setup_automount__disks_mount_dir_paths
       ansible.builtin.set_fact:
         setup_automount__disks_mount_dir_paths: >-

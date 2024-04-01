@@ -21,12 +21,31 @@ zfs__create_pool__type: "mirror"
 zfs__create_pool__pool_name: "zdata"
 zfs__create_pool__mount_path: "/mnt/{{ zfs__create_pool__pool_name }}"
 
-crypttab__add_entry__disk_data_list: >-
+crypttab__add_entry__zfs_miror_disk_data_list: >-
   {{ 
     luks__open__disk_data_list_result[:2] |
     map('combine', {'options': ['luks','discard']})
   }}
+crypttab__add_entry__ext4_standalone_disk_data_list: >-
+  {{ 
+    luks__open__disk_data_list_result[2:] |
+    map('combine', {'options': ['noauto','nofail']})
+  }}
+
+crypttab__add_entry__disk_data_list: >-
+  {{ 
+    crypttab__add_entry__zfs_miror_disk_data_list +
+    crypttab__add_entry__ext4_standalone_disk_data_list)
+  }}
 crypttab__add_entry__keyfile_file_path: "{{ luks__encrypt__keyfile_file_path }}"
+
+hdd__create_filesystem__disk_data: >-
+  {{ 
+    luks__open__disk_data_list_result[2:] |
+    map('combine', {'options': ['noauto','nofail']})
+  }}
+
+
 # ##########################################################################################################
 #
 #

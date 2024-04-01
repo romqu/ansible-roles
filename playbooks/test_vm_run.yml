@@ -72,10 +72,3 @@
 #         - bitwarden__create_item__type: "login"
 #         - bitwarden__create_item__folder_name: "server/home"
 #         - bitwarden__create_item__type_login_data: "{{ converter_b2_bitwarden___result }}"
-#     - role: create_backup_dirs
-#       vars:
-#         - create_backup_dirs__disks_mount_dir_paths: "{{ setup_automount__disks_mount_dir_paths }}"
-#         - create_backup_dirs__dir_name: "backup"
-#         - create_backup_dirs__backup_dir_owner: "{{ shared__test_vm__username }}"
-#         - create_backup_dirs__main_dir_marker_file_name: "{{ host_uuid }}"
-

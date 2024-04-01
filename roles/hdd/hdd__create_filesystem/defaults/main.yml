@@ -1,0 +1,3 @@
+hdd__create_filesystem__disk_data:
+  - disk_path: null
+    filesystem_type: "ext4"
