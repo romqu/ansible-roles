@@ -16,5 +16,5 @@
   ansible.builtin.systemd:
     state: restarted
     name: "{{ item }}"
-  loop: "{{ setup_automount__handler__load_automount }}"
+  loop: "{{ fstab__add_entry__load_automount }}"
   listen: "load automount"

@@ -13,10 +13,10 @@
     - role: luks/luks__encrypt
     - role: luks/luks__open
     #- role: zfs/zfs__install
-    - role: zfs/zfs__create_pool
+    #- role: zfs/zfs__create_pool
     - role: crypttab__add_entry
-    #- role: format_hard_drives
-    #- role: setup_automount
+    - role: hdd/hdd__create_filesystem
+    - role: fstab__add_entry
     #- role: create_backup_dirs
     #- role: docker__install
     #- role: restic__docker_setup

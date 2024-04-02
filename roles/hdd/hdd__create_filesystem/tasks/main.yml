@@ -9,8 +9,8 @@
         name: parted
         state: present
 
-    - name: Create filesystem for {{ item.disk_path }}
+    - name: Create filesystem for {{ hdd__create_filesystem__disk_data }}
       community.general.filesystem:
         fstype: "{{ item.filesystem_type }}"
-        dev: "{{ item.disk_path }}"
+        dev: "{{ item.partition_path }}"
       loop: "{{ hdd__create_filesystem__disk_data }}"

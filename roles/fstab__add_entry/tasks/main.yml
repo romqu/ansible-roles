@@ -1,46 +1,46 @@
 ---
 - name: Run when at least one disk found
   when:
-    - setup_automount__disks | length > 0
+    - fstab__add_entry__data_list | length > 0
   become: true
   block:
-    - name: Set fact setup_automount__disks_mount_dir_paths
-      ansible.builtin.set_fact:
-        setup_automount__disks_mount_dir_paths: >-
-          {{ setup_automount__disks_mount_dir_paths|default([])
-          + [setup_automount__mount_dir_path + "/" + item.partition_name] }}
-      loop: "{{ setup_automount__disks_with_uuid }}"
-
-    - name: Create mount folders for {{ setup_automount__disks }}
+    - name: Create mount folders for {{ fstab__add_entry__data_list }}
       ansible.builtin.file:
-        path: "{{ item }}"
+        path: "{{ mount_dir_path }}"
         state: directory
-        owner: "{{ setup_automount__disk_mount_dir_owner }}"
-        group: "{{ setup_automount__disk_mount_dir_owner }}"
+        owner: "{{ item.mount_dir_owner }}"
+        group: "{{ item.mount_dir_owner }}"
         mode: '0755'
-      loop: "{{ setup_automount__disks_mount_dir_paths }}"
+      loop: "{{ fstab__add_entry__data_list }}"
+      vars:
+        mount_dir_path: 
+          "{{ item.mount_root_dir_path }}/{{ item.partition_name }}"
 
-    - name: Add fstab entry for {{ setup_automount__disks }}
+    - name: Add fstab entry for {{ fstab__add_entry__data_list }}
       ansible.builtin.lineinfile:
         path: "/etc/fstab"
         insertafter: EOF
         line: "{{ fstab_line }}"
         regexp: "{{ fstab_line }}"
         create: true
-      loop: "{{ setup_automount__disks_with_uuid }}"
+      loop: "{{ fstab__add_entry__data_list }}"
       vars:
+        mount_dir_path: 
+          "{{ item.mount_root_dir_path }}/{{ item.partition_name }}"
         fstab_line: >-
-          /dev/mapper/{{ item.partition_name }}
-          {{ setup_automount__mount_dir_path }}/{{ item.partition_name }}
-          {{ setup_automount__partition_filesystem }}
-          noauto,nofail,x-systemd.automount,x-systemd.idle-timeout={{ setup_automount__systemd_idle_timeout_sec }}
-          0 0
+          {{ item.partition_path }}
+          {{ mount_dir_path }}
+          {{ item.partition_filesystem }}
+          noauto,nofail,x-systemd.automount,x-systemd.idle-timeout=
+          {{- item.systemd_idle_timeout_sec }} 0 0
 
-    - name: Set fact 'setup_automount__handler__load_automount'
+    - name: Set fact 'fstab__add_entry__load_automount'
       ansible.builtin.set_fact:
-        setup_automount__handler__load_automount: >-
-          {{ setup_automount__handler__load_automount|default([])
-          + [setup_automount__mount_dir_name + "-" + item.partition_name + "." + "automount"] }}
-      loop: "{{ setup_automount__disks_with_uuid }}"
-      changed_when: true
+        fstab__add_entry__load_automount: >-
+          {{ fstab__add_entry__load_automount | default([]) + [append] }}
+      loop: "{{ fstab__add_entry__data_list }}"
+      vars:
+        append: 
+          "{{ item.mount_root_dir_name }}-{{ item.partition_name }}.automount"
       notify: "load automount"
+      changed_when: true

@@ -12,7 +12,6 @@ luks__encrypt__keyfile_dir_path: "/etc/cryptsetup-keys.d/"
 luks__encrypt__keyfile_file_path: >-
   {{ luks__encrypt__keyfile_dir_path }}{{ luks__encrypt__keyfile_file_name }}
 luks__encrypt__passphrase: "{{ bitwarden__get_password__result }}"
-
 luks__open__disk_path_list: "{{ hdd__get_all__no_partitions_disk_paths_result }}"
 luks__open__keyfile_path: "{{ luks__encrypt__keyfile_file_path }}"
 
@@ -33,34 +32,45 @@ crypttab__add_entry__ext4_standalone_disk_data_list: >-
   }}
 
 crypttab__add_entry__disk_data_list: >-
-  {{ 
-    crypttab__add_entry__zfs_miror_disk_data_list +
-    crypttab__add_entry__ext4_standalone_disk_data_list)
+  {{
+    crypttab__add_entry__ext4_standalone_disk_data_list
   }}
 crypttab__add_entry__keyfile_file_path: "{{ luks__encrypt__keyfile_file_path }}"
-
 hdd__create_filesystem__disk_data: >-
   {{ 
     luks__open__disk_data_list_result[2:] |
-    map('combine', {'options': ['noauto','nofail']})
+    map('combine', {'filesystem_type': 'ext4'})
   }}
 
+fstab__add_entry__data_list: >-
+  {{ 
+    luks__open__disk_data_list_result[2:] |
+    map('combine',
+        {
+          'partition_filesystem': 'ext4',
+          'mount_root_dir_path': '/mnt',
+          'mount_root_dir_name': 'mnt',
+          'mount_dir_owner': shared__test_vm__username,
+          'systemd_idle_timeout_sec': 30,
+        }
+       )
+  }}
+
+#    partition_name: null
+#    partition_filesystem: null
+#    mount_root_dir_name: null
+#    mount_root_dir_path: null
+#    mount_dir_owner: null
+#    systemd_idle_timeout_sec: null
+
+#luks__open__disk_data_list_result:
+#  - disk_path: ""
+#    partition_path: ""
+#    partition_name: ""
 
 # ##########################################################################################################
 #
 #
-# format_hard_drives__drives: "{{ hdd__get_all__no_filesystem_result_fact }}"
-# format_hard_drives__partition: "{{ luks__open__disks_with_partition_name | map(attribute='partition_name') }}"
-# format_hard_drives__partition_filesystem: "ext4"
-# format_hard_drives__encrypted: true
-#
-# setup_automount__disks: "{{ luks__open__disks_with_partition_name }}"
-# setup_automount__keyfile_file_path: "{{ luks__encrypt__keyfile_file_path }}"
-# setup_automount__partition_filesystem: "{{ format_hard_drives__partition_filesystem }}"
-# setup_automount__mount_dir_name: "mnt"
-# setup_automount__mount_dir_path: "/{{ setup_automount__mount_dir_name }}"
-# setup_automount__disk_mount_dir_owner: "{{ shared__test_vm__username }}"
-# setup_automount__systemd_idle_timeout_sec: 30
 #
 # create_backup_dirs__disks_mount_dir_paths: ["/mnt/sda0", "/mnt/sdb0"] # "{{ setup_automount__disks_mount_dir_paths }}"
 # create_backup_dirs__dir_name: "backup"
