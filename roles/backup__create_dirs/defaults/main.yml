@@ -1,0 +1,15 @@
+backup__create_dirs__data_list:
+  - root_dir_path: null
+    backup_dir_name: null
+    backup_dir_path: null
+    backup_dir_owner: null
+
+backup__create_dirs__main_dir_marker_file_name: null
+backup__create_dirs__main_dir_marker_file: 
+  ".{{ backup__create_dirs__main_dir_marker_file_name }}"
+backup__create_dirs__main_backup_dir_path: >-
+  {{ backup__create_dirs__data_list[0].backup_dir_path + '/' +
+    backup__create_dirs___main_dir_marker_file
+  }}
+backup__create_dirs__main_backup_dir_owner:
+  "{{ backup__create_dirs__data_list[0].backup_dir_owner }}"

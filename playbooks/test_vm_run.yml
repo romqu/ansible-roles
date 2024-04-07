@@ -7,68 +7,21 @@
   #ansible_python_interpreter: "/Users/roman/projects/personal/ansible-server-config/venv/bin/python"
   
   roles:
-    #- role: sshd__setup_config
+    - role: sshd__setup_config
     - role: hdd/hdd__get_all
     - role: hdd/hdd__wipe
     - role: luks/luks__encrypt
     - role: luks/luks__open
-    #- role: zfs/zfs__install
-    #- role: zfs/zfs__create_pool
+    - role: zfs/zfs__install
+    - role: zfs/zfs__create_pool
     - role: crypttab__add_entry
     - role: hdd/hdd__create_filesystem
     - role: fstab__add_entry
-    #- role: create_backup_dirs
-    #- role: docker__install
-    #- role: restic__docker_setup
-    #- role: systemd__create_service
-    #- role: systemd__create_timer
-    #- role: caddy/caddy__docker_setup
-    #- role: caddy/caddy__add_site
-    #- role: tailscale__docker_setup
-
-
-#     - role: get_bitwarden__field
-#       vars:
-#         - get_bitwarden__field__fields:
-#             [
-#               {
-#                 "get_bitwarden__field__fact_name": "get_bitwarden__field__b2_eu_master_key",
-#                 "get_bitwarden__field__entry_name": "backblaze-eu",
-#                 "get_bitwarden__field__field_name": "masterApplicationKey",
-#               },
-#               {
-#                 "get_bitwarden__field__fact_name": "get_bitwarden__field__b2_us_west_master_key_id",
-#                 "get_bitwarden__field__entry_name": "backblaze-us-west",
-#                 "get_bitwarden__field__field_name": "masterKeyId",
-#               },
-#               {
-#                 "get_bitwarden__field__fact_name": "get_bitwarden__field__b2_us_west_master_key",
-#                 "get_bitwarden__field__entry_name": "backblaze-us-west",
-#                 "get_bitwarden__field__field_name": "masterApplicationKey",
-#               },
-#             ]
-#     - role: setup_b2_buckets
-#       vars:
-#         - setup_b2_buckets__bucket_name_uuid: "{{ host_uuid }}"
-#         - setup_b2_buckets__accounts: [
-#               {
-#                 "master_key_id": "", # "{{ get_bitwarden__field__b2_eu_master_key_id }}"
-#                 "master_key": "", # "{{ get_bitwarden__field__b2_eu_master_key }}"
-#                 "profile_name": "main",
-#               },
-#               {
-#                 "master_key_id": "", # "{{ get_bitwarden__field__b2_us_west_master_key_id }}",
-#                 "master_key": "", # "{{ get_bitwarden__field__b2_us_west_master_key }}",
-#                 "profile_name": "replication",
-#               },
-#             ]
-#     - role: converter_b2_bitwarden
-#       vars:
-#         - converter_b2_bitwarden___b2_account_data: "{{ setup_b2_buckets__accounts__result }}"
-#         - converter_b2_bitwarden___field_name: "restic_password"
-#         - converter_b2_bitwarden___field_value: "{{ bitwarden__generate_password__result }}"
-#     - role: bitwarden__create_item
-#       vars:
-#         - bitwarden__create_item__type: "login"
-#         - bitwarden__create_item__folder_name: "server/home"
-#         - bitwarden__create_item__type_login_data: "{{ converter_b2_bitwarden___result }}"
+    - role: backup__create_dirs
+    # - role: docker__install
+    # - role: restic__docker_setup
+    # - role: systemd__create_service
+    # - role: systemd__create_timer
+    # - role: caddy/caddy__docker_setup
+    # - role: caddy/caddy__add_site
+    # - role: tailscale__docker_setup

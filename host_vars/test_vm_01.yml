@@ -15,7 +15,8 @@ luks__encrypt__passphrase: "{{ bitwarden__get_password__result }}"
 luks__open__disk_path_list: "{{ hdd__get_all__no_partitions_disk_paths_result }}"
 luks__open__keyfile_path: "{{ luks__encrypt__keyfile_file_path }}"
 
-zfs__create_pool__disk_path_list: "{{ luks__open__disk_data_list_result[:2] | map(attribute='partition_path') }}"
+zfs__create_pool__disk_path_list: >-
+  {{ luks__open__disk_data_list_result[:2] | map(attribute='partition_path') }}
 zfs__create_pool__type: "mirror"
 zfs__create_pool__pool_name: "zdata"
 zfs__create_pool__mount_path: "/mnt/{{ zfs__create_pool__pool_name }}"
@@ -33,9 +34,11 @@ crypttab__add_entry__ext4_standalone_disk_data_list: >-
 
 crypttab__add_entry__disk_data_list: >-
   {{
-    crypttab__add_entry__ext4_standalone_disk_data_list
+    crypttab__add_entry__ext4_standalone_disk_data_list +
+    crypttab__add_entry__zfs_miror_disk_data_list
   }}
 crypttab__add_entry__keyfile_file_path: "{{ luks__encrypt__keyfile_file_path }}"
+
 hdd__create_filesystem__disk_data: >-
   {{ 
     luks__open__disk_data_list_result[2:] |
@@ -56,26 +59,78 @@ fstab__add_entry__data_list: >-
        )
   }}
 
-#    partition_name: null
-#    partition_filesystem: null
-#    mount_root_dir_name: null
-#    mount_root_dir_path: null
-#    mount_dir_owner: null
-#    systemd_idle_timeout_sec: null
+backup__create_dirs__data_list_temp: >-
+  {% set ns = namespace(updated_json='',json_list=[]) %}
+  {% for item in fstab__add_entry__data_list %}
+    {% set root_dir_path =  item.mount_root_dir_path + "/" + item.partition_name %}
+    {% set backup_dir_name = "backup" %}
+    {% set backup_dir_path =  root_dir_path + "/" + backup_dir_name %}
+    {% set ns.updated_json =
+      {
+        'root_dir_path': root_dir_path,
+        'backup_dir_name': backup_dir_name,
+        'backup_dir_path': backup_dir_path,
+        'backup_dir_owner': shared__test_vm__username
+      }
+    %}
+    {% set _ = ns.json_list.append(ns.updated_json) %}
+  {% endfor %}
+  {{ ns.json_list }}
 
-#luks__open__disk_data_list_result:
-#  - disk_path: ""
-#    partition_path: ""
-#    partition_name: ""
+backup__create_dirs__data_list: >-
+  {{ backup__create_dirs__data_list_temp | trim | to_json | from_yaml }}
+
 
 # ##########################################################################################################
 #
 #
 #
-# create_backup_dirs__disks_mount_dir_paths: ["/mnt/sda0", "/mnt/sdb0"] # "{{ setup_automount__disks_mount_dir_paths }}"
-# create_backup_dirs__dir_name: "backup"
-# create_backup_dirs__backup_dir_owner: "{{ shared__test_vm__username }}"
-# create_backup_dirs__main_dir_marker_file_name: "{{ host_uuid }}
+#
+#     - role: get_bitwarden__field
+#       vars:
+#         - get_bitwarden__field__fields:
+#             [
+#               {
+#                 "get_bitwarden__field__fact_name": "get_bitwarden__field__b2_eu_master_key",
+#                 "get_bitwarden__field__entry_name": "backblaze-eu",
+#                 "get_bitwarden__field__field_name": "masterApplicationKey",
+#               },
+#               {
+#                 "get_bitwarden__field__fact_name": "get_bitwarden__field__b2_us_west_master_key_id",
+#                 "get_bitwarden__field__entry_name": "backblaze-us-west",
+#                 "get_bitwarden__field__field_name": "masterKeyId",
+#               },
+#               {
+#                 "get_bitwarden__field__fact_name": "get_bitwarden__field__b2_us_west_master_key",
+#                 "get_bitwarden__field__entry_name": "backblaze-us-west",
+#                 "get_bitwarden__field__field_name": "masterApplicationKey",
+#               },
+#             ]
+#     - role: setup_b2_buckets
+#       vars:
+#         - setup_b2_buckets__bucket_name_uuid: "{{ host_uuid }}"
+#         - setup_b2_buckets__accounts: [
+#               {
+#                 "master_key_id": "", # "{{ get_bitwarden__field__b2_eu_master_key_id }}"
+#                 "master_key": "", # "{{ get_bitwarden__field__b2_eu_master_key }}"
+#                 "profile_name": "main",
+#               },
+#               {
+#                 "master_key_id": "", # "{{ get_bitwarden__field__b2_us_west_master_key_id }}",
+#                 "master_key": "", # "{{ get_bitwarden__field__b2_us_west_master_key }}",
+#                 "profile_name": "replication",
+#               },
+#             ]
+#     - role: converter_b2_bitwarden
+#       vars:
+#         - converter_b2_bitwarden___b2_account_data: "{{ setup_b2_buckets__accounts__result }}"
+#         - converter_b2_bitwarden___field_name: "restic_password"
+#         - converter_b2_bitwarden___field_value: "{{ bitwarden__generate_password__result }}"
+#     - role: bitwarden__create_item
+#       vars:
+#         - bitwarden__create_item__type: "login"
+#         - bitwarden__create_item__folder_name: "server/home"
+#         - bitwarden__create_item__type_login_data: "{{ converter_b2_bitwarden___result }}"
 #
 # restic__docker_setup__aws_access_key_id: ""
 # restic__docker_setup__aws_secret_access_key: ""
