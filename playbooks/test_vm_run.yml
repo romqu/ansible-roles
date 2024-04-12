@@ -7,14 +7,15 @@
   #ansible_python_interpreter: "/Users/roman/projects/personal/ansible-server-config/venv/bin/python"
   
   roles:
-    - role: sshd__setup_config
+    #- role: sshd__setup_config
     - role: hdd/hdd__get_all
     - role: hdd/hdd__wipe
     - role: luks/luks__encrypt
     - role: luks/luks__open
-    - role: zfs/zfs__install
+    #- role: zfs/zfs__install
     - role: zfs/zfs__create_pool
     - role: crypttab__add_entry
+    - role: zfs/zfs__create_dataset
     - role: hdd/hdd__create_filesystem
     - role: fstab__add_entry
     - role: backup__create_dirs

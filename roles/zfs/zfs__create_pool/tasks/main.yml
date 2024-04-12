@@ -13,4 +13,4 @@
     - zfs__create_pool__disk_path_list is iterable
     - (zfs__create_pool__disk_path_list | length) > 1
   vars:
-    disk_paths: "{{ zfs__create_pool__disk_path_list | join (' ') }}"
+    disk_paths: "{{ zfs__create_pool__disk_path_list | join(' ') }}"

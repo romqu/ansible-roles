@@ -22,7 +22,7 @@
   ansible.builtin.set_fact:
     backup__create_dirs__main_backup_dir_found_file_list: >-
       {{ backup__create_dirs__main_backup_dir_found_file_list +
-        [files] | flatten  
+        [files] | flatten
       }}
   loop: "{{ backup__create_dirs__main_dir_marker_file_result.results }}"
   when: files | length > 0

@@ -59,7 +59,20 @@ fstab__add_entry__data_list: >-
        )
   }}
 
-backup__create_dirs__data_list_temp: >-
+zfs__create_dataset__data_list:
+  - pool_name: "{{ zfs__create_pool__pool_name }}"
+    dataset_name: "backup"
+
+backup__create_dirs__zfs_data_list_temp:
+  - root_dir_path: "{{ zfs__create_pool__mount_path }}/{{ zfs__create_pool__pool_name }}"
+    backup_dir_name: "backup"
+    backup_dir_path: >-
+      {{ zfs__create_pool__mount_path }}/
+      {{ zfs__create_pool__pool_name }}/backup"
+    backup_dir_owner: "{{ shared__test_vm__username }}"
+
+
+backup__create_dirs__ext4_data_list_temp: >-
   {% set ns = namespace(updated_json='',json_list=[]) %}
   {% for item in fstab__add_entry__data_list %}
     {% set root_dir_path =  item.mount_root_dir_path + "/" + item.partition_name %}
@@ -78,7 +91,10 @@ backup__create_dirs__data_list_temp: >-
   {{ ns.json_list }}
 
 backup__create_dirs__data_list: >-
-  {{ backup__create_dirs__data_list_temp | trim | to_json | from_yaml }}
+  {{ 
+    backup__create_dirs__zfs_data_list_temp + 
+    (backup__create_dirs__data_list_temp | trim | to_json | from_yaml)
+  }}
 
 
 # ##########################################################################################################
@@ -193,3 +209,10 @@ backup__create_dirs__data_list: >-
 # tailscale__docker_setup__dir_path: "/home/roman/docker/tailscale/"
 # tailscale__docker_setup__auth_key:
 #   ""
+
+
+# sudo zfs zpool destroy zdata
+# sudo cryptsetup close sda0_crypt
+# sudo cryptsetup close sdb0_crypt
+# sudo dd if=/dev/zero of=/dev/sda bs=4096
+# sudo dd if=/dev/zero of=/dev/sdb bs=4096

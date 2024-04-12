@@ -1,0 +1,9 @@
+- name: Create dataset
+  become: true
+  community.general.zfs:
+    name: "{{ dataset_path }}"
+    state: present
+    extra_zfs_properties: "{{ item.properties | default(omit) }}"
+  loop: "{{ zfs__create_dataset__data_list }}"
+  vars:
+    dataset_path: "{{ item.pool_name }}/{{ item.dataset_name }}"
