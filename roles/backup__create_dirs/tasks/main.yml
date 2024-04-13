@@ -30,7 +30,9 @@
     files: "{{ item.files }}"
 
 - name: Mark main backup dir
-  when: backup__create_dirs__main_backup_dir_found_file_list | length == 0
+  when: >-
+    backup__create_dirs__main_backup_dir_found_file_list |
+    default([]) | length == 0
   block:
     - name: Mark main backup dir when no found {{ backup__create_dirs__main_backup_dir_path }}
       ansible.builtin.file:

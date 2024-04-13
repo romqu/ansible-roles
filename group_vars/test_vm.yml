@@ -26,7 +26,7 @@ debian_vm_image_format: "qcow2"
 debian_vm_image_file: "{{ debian_vm_image_name }}.{{ debian_vm_image_format }}"
 debian_vm_tmp_image_file_path: "{{ debian_vm_tmp_files_dir_path }}/{{ debian_vm_image_file }}"
 
-debian_vm_hdd_image_quantity: 2
+debian_vm_hdd_image_quantity: 3
 debian_vm_hdd_image_name: "debian_hdd"
 debian_vm_hdd_image_format: "qcow2"
 debian_vm_hdd_image_file: "{{ debian_vm_hdd_image_name }}.{{ debian_vm_hdd_image_format }}"

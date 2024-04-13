@@ -46,8 +46,8 @@
     packages:
       [
         "dpkg-dev",
-        "linux-headers-amd64",
-        "linux-image-amd64",
+        "linux-headers-{{ ansible_kernel }}",
+        "linux-image-{{ ansible_kernel }}",
         "zfs-dkms",
         "zfs-zed",
         "zfsutils-linux",

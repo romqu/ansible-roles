@@ -1,0 +1,4 @@
+bitwarden_get_field__data_dict_list:
+  - bitwarden__get_field__fact_name: null
+    bitwarden__get_field__entry_name: null
+    bitwarden__get_field__field_name: null

@@ -1,4 +1,4 @@
-converter_b2_bitwarden___b2_account_data: # ref: setup_b2_buckets__accounts__result
+converter_b2_bitwarden___b2_account_data: # ref: backblaze_b2__setup_buckets__account_dict_list__result
 converter_b2_bitwarden___field_name: "field"
 converter_b2_bitwarden___field_value: "value"
 converter_b2_bitwarden___field_type: "1"

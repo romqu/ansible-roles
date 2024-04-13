@@ -1,0 +1,15 @@
+backblaze_b2__setup_buckets__bucket_name_uuid: null
+backblaze_b2__setup_buckets__account_dict_list: null
+#  - master_key_id: ""
+#    master_key: ""
+#    profile_name: ""
+#    bucket_name": ""
+  
+
+backblaze_b2__setup_buckets__bucket_key_suffix: "-key"
+
+backblaze_b2__setup_buckets__resuult: null
+#  {
+#    "existsAlready": false,
+#    "buckets_data": [ { "bucket_name": "", "bucket_key": "" } ],
+#  }

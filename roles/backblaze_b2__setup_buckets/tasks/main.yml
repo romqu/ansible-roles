@@ -12,44 +12,44 @@
     name: b2
     extra_args: --system
 
-- name: Authorize b2 accounts {{ setup_b2_buckets__accounts }}
+- name: Authorize b2 accounts {{ backblaze_b2__setup_buckets__account_dict_list }}
   ansible.builtin.command: b2 authorize-account {{ item.master_key_id }} {{ item.master_key }} --profile {{ item.profile_name }}
-  loop: "{{ setup_b2_buckets__accounts }}"
+  loop: "{{ backblaze_b2__setup_buckets__account_dict_list }}"
   changed_when: true
 
 - name: Set bucket names
   ansible.builtin.set_fact:
-    setup_b2_buckets__data: >-
-      {{ setup_b2_buckets__data | default([]) + [item | combine({ 'bucket_name':
+    backblaze_b2__setup_buckets__data: >-
+      {{ backblaze_b2__setup_buckets__data | default([]) + [item | combine({ 'bucket_name':
             ansible_hostname
             + '-'
             + item.profile_name
             + '-'
-            + setup_b2_buckets__bucket_name_uuid })]
+            + backblaze_b2__setup_buckets__bucket_name_uuid })]
       }}
-  loop: "{{ setup_b2_buckets__accounts }}"
+  loop: "{{ backblaze_b2__setup_buckets__account_dict_list }}"
 
-- name: Register all bucket names for profile '{{ setup_b2_buckets__data[0].profile_name }}'
+- name: Register all bucket names for profile '{{ backblaze_b2__setup_buckets__data[0].profile_name }}'
   ansible.builtin.shell: b2 list-buckets --profile {{ profile_name }} | awk '{print $3}'
-  register: setup_b2_buckets__bucket_names_result
+  register: backblaze_b2__setup_buckets__bucket_names_result
   vars:
-    profile_name: "{{ setup_b2_buckets__data[0].profile_name }}"
+    profile_name: "{{ backblaze_b2__setup_buckets__data[0].profile_name }}"
   changed_when: true
 
 - name: Set if buckets already exists fact
   ansible.builtin.set_fact:
-    setup_b2_buckets__buckets_already_exists: "{{ setup_b2_buckets__data[0].bucket_name in setup_b2_buckets__bucket_names_result.stdout_lines }}"
+    backblaze_b2__setup_buckets__buckets_already_exists: "{{ backblaze_b2__setup_buckets__data[0].bucket_name in backblaze_b2__setup_buckets__bucket_names_result.stdout_lines }}"
 
 - name: Create buckets with keys
-  when: not setup_b2_buckets__buckets_already_exists
+  when: not backblaze_b2__setup_buckets__buckets_already_exists
   block:
     - name: Create buckets
       ansible.builtin.command:
         b2 create-bucket --profile {{ item.profile_name }}
         {{ item.bucket_name }}
         allPrivate
-      loop: "{{ setup_b2_buckets__data }}"
-      register: setup_b2_buckets__create_buckets_result
+      loop: "{{ backblaze_b2__setup_buckets__data }}"
+      register: backblaze_b2__setup_buckets__create_buckets_result
       changed_when: true
 
     - name: Create keys for buckets
@@ -57,39 +57,39 @@
         b2 create-key
         --profile {{ item.profile_name }}
         --bucket {{ item.bucket_name }}
-        {{ item.bucket_name }}{{ setup_b2_buckets__bucket_key_suffix }}
+        {{ item.bucket_name }}{{ backblaze_b2__setup_buckets__bucket_key_suffix }}
         readFileLegalHolds,readFileRetentions,deleteFiles,listBuckets,\
         listFiles,readBucketEncryption,readBucketReplications,\
         readBuckets,readFiles,shareFiles,writeBucketEncryption,\
         writeBucketReplications,writeFiles
-      loop: "{{ setup_b2_buckets__data }}"
-      register: setup_b2_buckets__create_keys_result
+      loop: "{{ backblaze_b2__setup_buckets__data }}"
+      register: backblaze_b2__setup_buckets__create_keys_result
       changed_when: true
 
     - name: Name keys
       ansible.builtin.set_fact:
-        setup_b2_buckets__created_keys: "{{ setup_b2_buckets__created_keys | default([]) + [named] }}"
-      loop: "{{ setup_b2_buckets__create_keys_result.results }}"
+        backblaze_b2__setup_buckets__created_keys: "{{ backblaze_b2__setup_buckets__created_keys | default([]) + [named] }}"
+      loop: "{{ backblaze_b2__setup_buckets__create_keys_result.results }}"
       vars:
         splitted: "{{ item.stdout | split(' ') }}"
         named: "{{ {'bucket_key_id': splitted[0], 'bucket_key': splitted[1]} }}"
 
     - name: Combine everything
       ansible.builtin.set_fact:
-        setup_b2_buckets__data: "{{ appended[1:] }}"
-      loop: "{{ setup_b2_buckets__data }}"
+        backblaze_b2__setup_buckets__data: "{{ appended[1:] }}"
+      loop: "{{ backblaze_b2__setup_buckets__data }}"
       loop_control:
         index_var: index
       vars:
-        bucket_id: "{{ {'bucket_id': setup_b2_buckets__create_buckets_result.results[index].stdout} }}"
-        bucket_key_data: "{{ setup_b2_buckets__created_keys[index] }}"
-        combined: "{{ [setup_b2_buckets__data[index] | combine(item, bucket_id, bucket_key_data)] }}"
-        appended: "{{ setup_b2_buckets__data + combined }}"
+        bucket_id: "{{ {'bucket_id': backblaze_b2__setup_buckets__create_buckets_result.results[index].stdout} }}"
+        bucket_key_data: "{{ backblaze_b2__setup_buckets__created_keys[index] }}"
+        combined: "{{ [backblaze_b2__setup_buckets__data[index] | combine(item, bucket_id, bucket_key_data)] }}"
+        appended: "{{ backblaze_b2__setup_buckets__data + combined }}"
 
     - name: Create destination replication rule(s)
       ansible.builtin.shell: >-
         b2 update-bucket --profile {{ item.profile_name }} --replication '{{ replication_body }}' {{ item.bucket_name }}
-      loop: "{{ setup_b2_buckets__data[1:] }}"
+      loop: "{{ backblaze_b2__setup_buckets__data[1:] }}"
       loop_control:
         index_var: index
       vars:
@@ -97,7 +97,7 @@
           {
             "asReplicationDestination": {
                 "sourceToDestinationKeyMapping": {
-                    {{ setup_b2_buckets__data[0].bucket_key_id }}: {{ item.bucket_key_id }}
+                    {{ backblaze_b2__setup_buckets__data[0].bucket_key_id }}: {{ item.bucket_key_id }}
                 }
             }
           }
@@ -107,12 +107,12 @@
     - name: Create source replication rule(s)
       ansible.builtin.shell: >-
         b2 update-bucket --profile {{ source.profile_name }} --replication '{{ replication_body }}' {{ source.bucket_name }}
-      loop: "{{ setup_b2_buckets__data[1:] }}"
+      loop: "{{ backblaze_b2__setup_buckets__data[1:] }}"
       loop_control:
         index_var: index
       vars:
-        source: "{{ setup_b2_buckets__data[0] }}"
-        dict_string: >
+        source: "{{ backblaze_b2__setup_buckets__data[0] }}"
+        dict_string: >-
           {
             "asReplicationSource": {
                 "replicationRules": [
@@ -126,13 +126,13 @@
                 "sourceApplicationKeyId": {{ source.bucket_key_id }}
             }
           }
-          replication_body: "{{ dict_string | from_yaml | to_json}}"
+        replication_body: "{{ dict_string | from_yaml | to_json}}"
       changed_when: true
 
 - name: Set buckets result data
   ansible.builtin.set_fact:
-    setup_b2_buckets__buckets_data_result: "{{ setup_b2_buckets__buckets_data_result | default([]) + result_body }}"
-  loop: "{{ setup_b2_buckets__data }}"
+    backblaze_b2__setup_buckets__buckets_data_result: "{{ backblaze_b2__setup_buckets__buckets_data_result | default([]) + result_body }}"
+  loop: "{{ backblaze_b2__setup_buckets__data }}"
   vars:
     bucket_name: "bucket_name"
     bucket_key: "bucket_key"
@@ -140,21 +140,21 @@
 
 - name: Set task result
   ansible.builtin.set_fact:
-    setup_b2_buckets__result: "{{ {'buckets_already_exists': setup_b2_buckets__buckets_already_exists, 'buckets_data': setup_b2_buckets__buckets_data_result } }}"
+    backblaze_b2__setup_buckets__resuult: "{{ {'buckets_already_exists': backblaze_b2__setup_buckets__buckets_already_exists, 'buckets_data': backblaze_b2__setup_buckets__buckets_data_result } }}"
 
 - name: Clear accounts
   ansible.builtin.command: b2 clear-account --profile {{ item.profile_name }}
-  loop: "{{ setup_b2_buckets__data }}"
+  loop: "{{ backblaze_b2__setup_buckets__data }}"
 
 - name: Get b2 files to delete
   ansible.builtin.find:
     paths: "{{ ansible_env.HOME }}/"
     patterns: ".b2*"
     hidden: true
-  register: setup_b2_buckets__find_files_delete_result
+  register: backblaze_b2__setup_buckets__find_files_delete_result
 
 - name: Delete b2 files
   ansible.builtin.file:
     state: absent
     path: "{{ item.path }}"
-  loop: "{{ setup_b2_buckets__find_files_delete_result.files }}"
+  loop: "{{ backblaze_b2__setup_buckets__find_files_delete_result.files }}"
