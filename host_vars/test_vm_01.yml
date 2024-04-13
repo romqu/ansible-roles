@@ -64,11 +64,13 @@ zfs__create_dataset__data_list:
     dataset_name: "backup"
 
 backup__create_dirs__zfs_data_list_temp:
-  - root_dir_path: "{{ zfs__create_pool__mount_path }}/{{ zfs__create_pool__pool_name }}"
+  - root_dir_path: >-
+      {{ zfs__create_pool__mount_path }}/
+      {{- zfs__create_dataset__data_list[0].dataset_name }}
     backup_dir_name: "backup"
     backup_dir_path: >-
       {{ zfs__create_pool__mount_path }}/
-      {{ zfs__create_pool__pool_name }}/backup"
+      {{- zfs__create_dataset__data_list[0].dataset_name  }}/backup"
     backup_dir_owner: "{{ shared__test_vm__username }}"
 
 
@@ -93,7 +95,7 @@ backup__create_dirs__ext4_data_list_temp: >-
 backup__create_dirs__data_list: >-
   {{ 
     backup__create_dirs__zfs_data_list_temp + 
-    (backup__create_dirs__data_list_temp | trim | to_json | from_yaml)
+    (backup__create_dirs__data_list_temp | default([]) | trim | to_json | from_yaml | list )
   }}
 
 
