@@ -69,9 +69,8 @@ backup__create_dirs__zfs_data_list_temp:
     backup_dir_name: "backup"
     backup_dir_path: >-
       {{ zfs__create_pool__mount_path }}/
-      {{- zfs__create_dataset__data_list[0].dataset_name }}/backup"
+      {{- zfs__create_dataset__data_list[0].dataset_name }}/backup
     backup_dir_owner: "{{ shared__test_vm__username }}"
-
 backup__create_dirs__ext4_data_list_temp_0: >-
   {% set ns = namespace(updated_json='',json_list=[]) %}
   {% for item in fstab__add_entry__data_list %}
@@ -89,38 +88,40 @@ backup__create_dirs__ext4_data_list_temp_0: >-
     {% set _ = ns.json_list.append(ns.updated_json) %}
   {% endfor %}
   {{ ns.json_list }}
-
 backup__create_dirs__ext4_data_list_temp_1: >-
   {{ backup__create_dirs__ext4_data_list_temp_0 | trim | to_json | from_yaml }}
-
 backup__create_dirs__data_list: >-
   {{ 
     backup__create_dirs__zfs_data_list_temp + 
     (backup__create_dirs__ext4_data_list_temp_1 )
   }}
 backup__create_dirs__main_dir_marker_file_name: "{{ host_uuid }}"
+
 bitwarden_get_field__data_dict_list:
   - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_eu_master_key"
     bitwarden__get_field__entry_name: "backblaze-eu"
     bitwarden__get_field__field_name: "masterApplicationKey"
 
-  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_us_west_master_key_id"
-    bitwarden__get_field__entry_name: "backblaze-us-west"
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_eu_master_key_id"
+    bitwarden__get_field__entry_name: "backblaze-eu"
     bitwarden__get_field__field_name: "masterKeyId"
 
   - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_us_west_master_key"
     bitwarden__get_field__entry_name: "backblaze-us-west"
     bitwarden__get_field__field_name: "masterApplicationKey"
 
-backblaze_b2__setup_buckets__bucket_name_uuid: "{{ host_uuid }}"
-backblaze_b2__setup_buckets__account_dict_list: 
-  - master_key_id: "" # "{{ bitwarden__get_field__b2_eu_master_key_id }}"
-    master_key: "" # "{{ bitwarden__get_field__b2_eu_master_key }}"
-    profile_name: "main"
-  - master_key_id: "" # "{{ bitwarden__get_field__b2_us_west_master_key_id }}"
-    master_key: "" # "{{ bitwarden__get_field__b2_us_west_master_key }}"
-    profile_name: "replication"
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_us_west_master_key_id"
+    bitwarden__get_field__entry_name: "backblaze-us-west"
+    bitwarden__get_field__field_name: "masterKeyId"
 
+backblaze_b2__setup_buckets__bucket_name_uuid: "{{ host_uuid }}"
+backblaze_b2__setup_buckets__account_dict_list:
+  - master_key_id: "e4501b4824e9" # "{{ bitwarden__get_field__b2_eu_master_key_id }}"
+    master_key: "003c17168974656a354c7494fde422551ff6d82777" # "{{ bitwarden__get_field__b2_eu_master_key }}"
+    profile_name: "main"
+  - master_key_id: "ee0edeca9f91" # "{{ bitwarden__get_field__b2_us_west_master_key_id }}"
+    master_key: "002904c12d711feea02efd886a19bef49db766ba53" # "{{ bitwarden__get_field__b2_us_west_master_key }}"
+    profile_name: "replication"
 ############################################################################################################
 #     - role: converter_b2_bitwarden
 #       vars:
@@ -195,7 +196,7 @@ backblaze_b2__setup_buckets__account_dict_list:
 # tailscale__docker_setup__auth_key:
 #   ""
 
-# sudo zfs zpool destroy zdata
+# sudo zpool destroy zdata
 # sudo cryptsetup close sdb0_crypt
 # sudo cryptsetup close sdc0_crypt
 # sudo cryptsetup close sdd0_crypt

@@ -10,6 +10,13 @@
       loop: "{{ crypttab__add_entry__disk_data_list }}"
       changed_when: true
 
+    - name: Remove (old) crypttab entry for {{ fstab__add_entry__data_list }}
+      ansible.builtin.lineinfile:
+        path: "/etc/fstab"
+        regexp: "^{{ item.partition_name }}"
+        state: absent
+      loop: "{{ fstab__add_entry__data_list }}"
+
     - name: Add crypttab entry for '{{ crypttab__add_entry__disk_data_list | map(attribute='partition_name') }}''
       ansible.builtin.lineinfile:
         path: /etc/crypttab
