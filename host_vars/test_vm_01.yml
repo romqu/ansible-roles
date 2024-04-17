@@ -122,6 +122,16 @@ backblaze_b2__setup_buckets__account_dict_list:
   - master_key_id: "ee0edeca9f91" # "{{ bitwarden__get_field__b2_us_west_master_key_id }}"
     master_key: "002904c12d711feea02efd886a19bef49db766ba53" # "{{ bitwarden__get_field__b2_us_west_master_key }}"
     profile_name: "replication"
+
+bitwarden__create_item__data_dict_list:
+  - type: "login"
+    name: "test"
+    username: "test"
+    password: "test"
+    folder_name: "private/server/home"
+    folder_id: "8e525b0a-6b1a-430a-95ac-afe001025a8c"
+
+
 ############################################################################################################
 #     - role: converter_b2_bitwarden
 #       vars:

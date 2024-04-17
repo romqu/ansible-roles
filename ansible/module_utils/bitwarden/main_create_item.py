@@ -45,7 +45,7 @@ class BitwardenCreateItemModule(BitwardenModule):
 
     @property
     def ansible_result(self) -> dict:
-        return dict(changed=False, item_id="")
+        return dict(changed=False, item_id="", item_name="")
 
 
 def main_create_item(
@@ -69,6 +69,7 @@ def main_create_item(
                 )
             elif value.existing:
                 ansible_result[item_id] = str(value.existing.id)
+            ansible_result["item_name"] = value.name
             ansible_module.exit_json(**ansible_result)
         case Err(err_):
             err: BitwardenError = err_
