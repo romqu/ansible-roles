@@ -71,6 +71,8 @@ backup__create_dirs__zfs_data_list_temp:
       {{ zfs__create_pool__mount_path }}/
       {{- zfs__create_dataset__data_list[0].dataset_name }}/backup
     backup_dir_owner: "{{ shared__test_vm__username }}"
+
+# belongs into a role/task
 backup__create_dirs__ext4_data_list_temp_0: >-
   {% set ns = namespace(updated_json='',json_list=[]) %}
   {% for item in fstab__add_entry__data_list %}
@@ -97,6 +99,9 @@ backup__create_dirs__data_list: >-
   }}
 backup__create_dirs__main_dir_marker_file_name: "{{ host_uuid }}"
 
+backblaze_b2__bucket_name__main: "{{ ansible_hostname }}-main-{{ host_uuid }}"
+backblaze_b2__bucket_name__replication: "{{ ansible_hostname }}-replication-{{ host_uuid }}"
+
 bitwarden_get_field__data_dict_list:
   - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_eu_master_key"
     bitwarden__get_field__entry_name: "backblaze-eu"
@@ -114,16 +119,25 @@ bitwarden_get_field__data_dict_list:
     bitwarden__get_field__entry_name: "backblaze-us-west"
     bitwarden__get_field__field_name: "masterKeyId"
 
-backblaze_b2__setup_buckets__bucket_name_uuid: "{{ host_uuid }}"
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_main_key"
+    bitwarden__get_field__entry_name: "{{ backblaze_b2__bucket_name__main }}"
+    bitwarden__get_field__field_name: "password"
+
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_replicationb_key"
+    bitwarden__get_field__entry_name: "{{ backblaze_b2__bucket_name__replication }}"
+    bitwarden__get_field__field_name: "password"
+
 backblaze_b2__setup_buckets__account_dict_list:
   - master_key_id: "e4501b4824e9" # "{{ bitwarden__get_field__b2_eu_master_key_id }}"
     master_key: "003c17168974656a354c7494fde422551ff6d82777" # "{{ bitwarden__get_field__b2_eu_master_key }}"
     profile_name: "main"
+    bucket_name:  "{{ ansible_hostname }}-main-{{ host_uuid }}"
   - master_key_id: "ee0edeca9f91" # "{{ bitwarden__get_field__b2_us_west_master_key_id }}"
     master_key: "002904c12d711feea02efd886a19bef49db766ba53" # "{{ bitwarden__get_field__b2_us_west_master_key }}"
     profile_name: "replication"
+    bucket_name:  "{{ backblaze_b2__bucket_name__replication }}"
 
-bitwarden__create_item__data_dict_list:
+bitwarden__create_item__data_dict_list: 
   - type: "login"
     name: "test"
     username: "test"
@@ -133,17 +147,6 @@ bitwarden__create_item__data_dict_list:
 
 
 ############################################################################################################
-#     - role: converter_b2_bitwarden
-#       vars:
-#         - converter_b2_bitwarden___b2_account_data: "{{ backblaze_b2__setup_buckets__account_dict_list__result }}"
-#         - converter_b2_bitwarden___field_name: "restic_password"
-#         - converter_b2_bitwarden___field_value: "{{ bitwarden__generate_password__result }}"
-#     - role: bitwarden__create_item
-#       vars:
-#         - bitwarden__create_item__type: "login"
-#         - bitwarden__create_item__folder_name: "server/home"
-#         - bitwarden__create_item__type_login_data: "{{ converter_b2_bitwarden___result }}"
-#
 # restic__docker_setup__aws_access_key_id: ""
 # restic__docker_setup__aws_secret_access_key: ""
 # restic__docker_setup__restic_password: "a"
