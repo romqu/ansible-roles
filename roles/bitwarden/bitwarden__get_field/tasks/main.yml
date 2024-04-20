@@ -1,13 +1,13 @@
 - name: Get field
   ansible.builtin.set_fact:
     "{{ item.bitwarden__get_field__fact_name }}": >-
-      {{ 
+      {{
         lookup
         (
           'community.general.bitwarden',
           item.bitwarden__get_field__entry_name,
           field=item.bitwarden__get_field__field_name | default('password')
         ) |
-        first
+        first | default('')
       }}
   loop: "{{ bitwarden_get_field__data_dict_list }}"

@@ -1,4 +1,8 @@
-bitwarden__get_password__result: "{{ lookup('community.general.bitwarden', test_vm__bitwarden__item_name, field='password') | regex_replace(\"^(\\[')(.*)('\\])$\", '\\2') }}"
+bitwarden__get_password__result: >-
+  {{ 
+    lookup('community.general.bitwarden', test_vm__bitwarden__item_name, field='password') | 
+    first 
+  }}"
 
 ansible_become_pass: "{{ bitwarden__get_password__result }}"
 
@@ -123,7 +127,7 @@ bitwarden_get_field__data_dict_list:
     bitwarden__get_field__entry_name: "{{ backblaze_b2__bucket_name__main }}"
     bitwarden__get_field__field_name: "password"
 
-  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_replicationb_key"
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_replication_key"
     bitwarden__get_field__entry_name: "{{ backblaze_b2__bucket_name__replication }}"
     bitwarden__get_field__field_name: "password"
 
@@ -131,19 +135,26 @@ backblaze_b2__setup_buckets__account_dict_list:
   - master_key_id: "e4501b4824e9" # "{{ bitwarden__get_field__b2_eu_master_key_id }}"
     master_key: "003c17168974656a354c7494fde422551ff6d82777" # "{{ bitwarden__get_field__b2_eu_master_key }}"
     profile_name: "main"
-    bucket_name:  "{{ ansible_hostname }}-main-{{ host_uuid }}"
+    bucket_name:  "{{ backblaze_b2__bucket_name__main}}"
+    bucket_key: "{{ bitwarden__get_field__b2_main_key }}"
   - master_key_id: "ee0edeca9f91" # "{{ bitwarden__get_field__b2_us_west_master_key_id }}"
     master_key: "002904c12d711feea02efd886a19bef49db766ba53" # "{{ bitwarden__get_field__b2_us_west_master_key }}"
     profile_name: "replication"
     bucket_name:  "{{ backblaze_b2__bucket_name__replication }}"
+    bucket_key: "{{ bitwarden__get_field__b2_replication_key }}"
 
-bitwarden__create_item__data_dict_list: 
-  - type: "login"
-    name: "test"
-    username: "test"
-    password: "test"
-    folder_name: "private/server/home"
-    folder_id: "8e525b0a-6b1a-430a-95ac-afe001025a8c"
+
+bitwarden__convert_backblaze_b2__input_dict_list: >-
+  {{
+    backblaze_b2__setup_buckets__result |
+    map('combine',
+        {
+          'folder_name': 'private/server/home'
+        }
+       )
+  }}
+
+bitwarden__create_item__data_dict_list: "{{ bitwarden__convert_backblaze_b2__result }}"
 
 
 ############################################################################################################

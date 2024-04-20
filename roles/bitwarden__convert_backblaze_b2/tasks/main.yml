@@ -1,14 +1,13 @@
 ---
 - name: Convert
   ansible.builtin.set_fact:
-    converter_b2_bitwarden__result: "{{ converter_b2_bitwarden__result | default([]) + [entry_dict] }}"
-  loop: "{{ converter_b2_bitwarden___b2_account_data }}"
+    bitwarden__convert_backblaze_b2__result: >-
+      {{ bitwarden__convert_backblaze_b2__result | default([]) + [entry_dict] }}
+  loop: "{{ bitwarden__convert_backblaze_b2__input_dict_list }}"
   vars:
-    entry_dict: >-
-      {{
-        {
-          'type': login,
-          'name': item.bucket_name,
-          'username': item.bucket_name,
-          'password': item.bucket_key,
-      }}
+    entry_dict:
+      - type: "login"
+        name: "{{ item.bucket_name }}"
+        username: "{{ item.bucket_name }}"
+        password: "{{ item.bucket_key }}"
+        folder_name: "{{ item.folder_name }}"

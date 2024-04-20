@@ -1,4 +1,5 @@
 ---
+# TODO: convert to module at some point
 - name: Install packages
   become: true
   ansible.builtin.apt:
@@ -93,16 +94,16 @@
         index_var: index
       vars:
         bucket_id: >-
-          {{ 
+          {{
             {'bucket_id': backblaze_b2__setup_buckets__create_buckets_result.results[index].stdout}
           }}
         bucket_key_data: "{{ backblaze_b2__setup_buckets__created_keys[index] }}"
-        combined: >- 
-          {{ 
+        combined: >-
+          {{
             [
               backblaze_b2__setup_buckets__account_dict_list[index] |
               combine(item, bucket_id, bucket_key_data)
-            ] 
+            ]
           }}
         appended: "{{ backblaze_b2__setup_buckets__account_dict_list + combined }}"
 
@@ -154,13 +155,13 @@
         replication_body: "{{ dict_string | from_yaml | to_json }}"
       changed_when: true
   rescue:
-  - name: Delete b2 buckets
-    ansible.builtin.command: >-
-      {{ internal__b2_path }}
-      delete-bucket {{ item.bucket_name }}
-      --profile {{ item.profile_name }}
-    loop: "{{ backblaze_b2__setup_buckets__account_dict_list }}"
-    changed_when: true
+    - name: Delete b2 buckets
+      ansible.builtin.command: >-
+        {{ internal__b2_path }}
+        delete-bucket {{ item.bucket_name }}
+        --profile {{ item.profile_name }}
+      loop: "{{ backblaze_b2__setup_buckets__account_dict_list }}"
+      changed_when: true
 
 - name: Set buckets result data
   ansible.builtin.set_fact:
@@ -171,17 +172,9 @@
       }}
   loop: "{{ backblaze_b2__setup_buckets__account_dict_list }}"
   vars:
-    bucket_name: "bucket_name"
-    bucket_key: "bucket_key"
-    result_body: >-
-      {{
-        [
-          {
-            bucket_name: item[bucket_name],
-            bucket_key: item[bucket_key] | default('')
-          }
-        ]
-      }}
+    result_body:
+      - bucket_name: "{{ item.bucket_name }}"
+        bucket_key: "{{ item.bucket_key }}"
 
 - name: Set task result
   ansible.builtin.set_fact:
