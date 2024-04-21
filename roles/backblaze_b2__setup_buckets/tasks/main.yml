@@ -163,29 +163,21 @@
       loop: "{{ backblaze_b2__setup_buckets__account_dict_list }}"
       changed_when: true
 
-- name: Set buckets result data
-  ansible.builtin.set_fact:
-    backblaze_b2__setup_buckets__buckets_data_result: >-
-      {{
-        backblaze_b2__setup_buckets__buckets_data_result | default([]) +
-        result_body
-      }}
-  loop: "{{ backblaze_b2__setup_buckets__account_dict_list }}"
-  vars:
-    result_body:
-      - bucket_name: "{{ item.bucket_name }}"
-        bucket_key: "{{ item.bucket_key }}"
 
-- name: Set task result
+- name: Set result
   ansible.builtin.set_fact:
     backblaze_b2__setup_buckets__result: >-
       {{
-        {
-          'buckets_already_exists':
-            backblaze_b2__setup_buckets__buckets_already_exists,
-          'buckets_data': backblaze_b2__setup_buckets__buckets_data_result
-        }
+        backblaze_b2__setup_buckets__result | default([]) +
+        [
+          {
+            "bucket_name": item.bucket_name,
+            "bucket_key": item.bucket_key,
+            "bucket_key_id": item.bucket_key_id
+          }
+        ]
       }}
+  loop: "{{ backblaze_b2__setup_buckets__account_dict_list }}"
 
 - name: Clear accounts
   ansible.builtin.command: >-
@@ -195,5 +187,5 @@
 
 - name: Delete b2 folder
   ansible.builtin.file:
-    path:  "{{ ansible_env.HOME }}/.config/b2"
+    path: "{{ ansible_env.HOME }}/.config/b2"
     state: absent

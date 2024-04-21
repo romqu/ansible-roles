@@ -27,4 +27,4 @@ restic__docker_setup__repo_dict: >
       | unique
   }}
 restic__docker_setup__pushover_user_key: ""
-restic__docker_setup__pushover_token: ""
+restic__docker_setup__pushover_app_token: ""

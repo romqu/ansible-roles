@@ -99,10 +99,9 @@ backup__create_dirs__ext4_data_list_temp_1: >-
 backup__create_dirs__data_list: >-
   {{ 
     backup__create_dirs__zfs_data_list_temp + 
-    (backup__create_dirs__ext4_data_list_temp_1 )
+    backup__create_dirs__ext4_data_list_temp_1
   }}
 backup__create_dirs__main_dir_marker_file_name: "{{ host_uuid }}"
-
 backblaze_b2__bucket_name__main: "{{ ansible_hostname }}-main-{{ host_uuid }}"
 backblaze_b2__bucket_name__replication: "{{ ansible_hostname }}-replication-{{ host_uuid }}"
 
@@ -123,26 +122,44 @@ bitwarden_get_field__data_dict_list:
     bitwarden__get_field__entry_name: "backblaze-us-west"
     bitwarden__get_field__field_name: "masterKeyId"
 
-  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_main_key"
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_main_key_id"
     bitwarden__get_field__entry_name: "{{ backblaze_b2__bucket_name__main }}"
+    bitwarden__get_field__field_name: "username"
+
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_main_key"
+    bitwarden__get_field__entry_name: "{{backblaze_b2__bucket_name__main }}"
     bitwarden__get_field__field_name: "password"
+
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_replication_key_id"
+    bitwarden__get_field__entry_name: "{{backblaze_b2__bucket_name__replication }}"
+    bitwarden__get_field__field_name: "username"
 
   - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_replication_key"
     bitwarden__get_field__entry_name: "{{ backblaze_b2__bucket_name__replication }}"
     bitwarden__get_field__field_name: "password"
 
-backblaze_b2__setup_buckets__account_dict_list:
-  - master_key_id: "e4501b4824e9" # "{{ bitwarden__get_field__b2_eu_master_key_id }}"
-    master_key: "003c17168974656a354c7494fde422551ff6d82777" # "{{ bitwarden__get_field__b2_eu_master_key }}"
-    profile_name: "main"
-    bucket_name:  "{{ backblaze_b2__bucket_name__main}}"
-    bucket_key: "{{ bitwarden__get_field__b2_main_key }}"
-  - master_key_id: "ee0edeca9f91" # "{{ bitwarden__get_field__b2_us_west_master_key_id }}"
-    master_key: "002904c12d711feea02efd886a19bef49db766ba53" # "{{ bitwarden__get_field__b2_us_west_master_key }}"
-    profile_name: "replication"
-    bucket_name:  "{{ backblaze_b2__bucket_name__replication }}"
-    bucket_key: "{{ bitwarden__get_field__b2_replication_key }}"
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__pushover_user_key"
+    bitwarden__get_field__entry_name: "pushover_user_key"
+    bitwarden__get_field__field_name: "password"
 
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__pushover_restic_backup_app_token"
+    bitwarden__get_field__entry_name: "pushover_restic_backup_app_token"
+    bitwarden__get_field__field_name: "password"
+
+backblaze_b2__setup_buckets__account_dict_list:
+  - master_key_id: "{{ bitwarden__get_field__b2_eu_master_key_id }}"
+    master_key: "{{ bitwarden__get_field__b2_eu_master_key }}"
+    profile_name: "main"
+    bucket_name: "{{ backblaze_b2__bucket_name__main}}"
+    bucket_key_id: "{{ bitwarden__get_field__b2_main_key_id }}"
+    bucket_key: "{{ bitwarden__get_field__b2_main_key }}"
+
+  - master_key_id: "{{ bitwarden__get_field__b2_us_west_master_key_id }}"
+    master_key: "{{ bitwarden__get_field__b2_us_west_master_key }}"
+    profile_name: "replication"
+    bucket_name: "{{ backblaze_b2__bucket_name__replication }}"
+    bucket_key_id: "{{ bitwarden__get_field__b2_replication_key_id }}"
+    bucket_key: "{{ bitwarden__get_field__b2_replication_key }}"
 
 bitwarden__convert_backblaze_b2__input_dict_list: >-
   {{
@@ -156,40 +173,47 @@ bitwarden__convert_backblaze_b2__input_dict_list: >-
 
 bitwarden__create_item__data_dict_list: "{{ bitwarden__convert_backblaze_b2__result }}"
 
+restic__docker_setup__aws_access_key_id: "{{ bitwarden__get_field__b2_main_key_id }}"
+restic__docker_setup__aws_secret_access_key: "{{ bitwarden__get_field__b2_main_key }}"
+restic__docker_setup__restic_password: "{{ bitwarden__get_password__result }}"
+restic__docker_setup__pushover_user_key: "{{ bitwarden__get_field__pushover_user_key }}"
+restic__docker_setup__pushover_app_token: >-
+  {{ bitwarden__get_field__pushover_restic_backup_app_token }}
+restic__docker_setup__backup_folder_path_host: >-
+  {{ backup__create_dirs__zfs_data_list_temp[0].backup_dir_path }}
+restic__docker_setup__backup_folder_path_container: "/data"
+restic__docker_setup__repo_remote_dict:
+  - repo: "s3:s3.eu-central-003.backblazeb2.com/testromqu"
+    forget_args: >-
+      --keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75
+restic__docker_setup__repo_local_dict: >-
+    {{
+      backup__create_dirs__ext4_data_list_temp_1 |
+      ansible.utils.replace_keys(target=[
+        {
+          'before':'backup_dir_path',
+          'after':'repo'
+        }
+      ]) |
+      map('combine',
+        {
+          'forget_args': '--keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75'
+        }
+       )
+    }}
 
+systemd__create_service__file_name: "restic-backup"
+systemd__create_service__description: "restic-backup"
+systemd__create_service__group: "docker"
+systemd__create_service__exec_start: >-
+  nice -n -0 ionice -c 2 -n 0 docker compose -f
+  "{{ restic__docker_setup__compose_file_path }}" up -
+
+systemd__create_timer__file_name: "{{ systemd__create_service__file_name }}"
+systemd__create_timer__description: "{{ systemd__create_service__description + ' timer' }}"
+systemd__create_timer__unit: "{{ systemd__create_service__file }}"
+systemd__create_timer__on_calendar: "*-*-* 12:00:00"
 ############################################################################################################
-# restic__docker_setup__aws_access_key_id: ""
-# restic__docker_setup__aws_secret_access_key: ""
-# restic__docker_setup__restic_password: "a"
-# restic__docker_setup__backup_folder_path_host: "/home/roman/backup"
-# restic__docker_setup__backup_folder_path_container: "/data"
-# restic__docker_setup__repo_remote_dict:
-#   [
-#     {
-#       "repo": "s3:s3.eu-central-003.backblazeb2.com/testromqu",
-#       "forget_args": "--keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75",
-#     }
-#   ]
-# restic__docker_setup__repo_local_dict:
-#   [
-#     {
-#       "repo": "/home/roman/backup",
-#       "forget_args": "--keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75",
-#     }
-#   ]
-# restic__docker_setup__pushover_user_key: ""
-# restic__docker_setup__pushover_token: ""
-#
-# systemd__create_service__file_name: "restic-backup"
-# systemd__create_service__description: "restic-backup"
-# systemd__create_service__group: "docker"
-# systemd__create_service__exec_start: >-
-#   nice -n -0 ionice -c 2 -n 0 docker compose -f
-#   "{{ restic__docker_setup__compose_file_path }}" up -
-# systemd__create_timer__file_name: "{{ systemd__create_service__file_name }}"
-# systemd__create_timer__description: "{{ systemd__create_service__description + ' timer' }}"
-# systemd__create_timer__unit: "{{ systemd__create_service__file }}"
-# systemd__create_timer__on_calendar: "*-*-* 12:00:00"
 #
 # immich__docker_setup__dir_path: "/home/roman/docker/immich/"
 # immich__docker_setup__config_file_path: "/home/roman/docker/immich/immich.config"

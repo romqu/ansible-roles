@@ -6,11 +6,10 @@ backblaze_b2__setup_buckets__account_dict_list: null
 #    bucket_name: ""
 #    bucket_name: ""
 #    uuid: ""
-  
 
 backblaze_b2__setup_buckets__bucket_key_suffix: "-key"
 
-backblaze_b2__setup_buckets__result: null
+# backblaze_b2__setup_buckets__result:
 # - existsAlready: false
 #   buckets_data:
 #     - bucket_name: ""

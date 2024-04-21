@@ -3,7 +3,7 @@ set -o nounset
 set -o pipefail
 
 readonly pushover_user_key="{{ restic__docker_setup__pushover_user_key }}"
-readonly pushover_token="{{ restic__docker_setup__pushover_token }}"
+readonly pushover_token="{{ restic__docker_setup__pushover_app_token }}"
 
 readonly backup_folder_path="{{ restic__docker_setup__backup_folder_path_container }}"
 
