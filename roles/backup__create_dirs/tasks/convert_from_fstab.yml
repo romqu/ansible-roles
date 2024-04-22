@@ -1,0 +1,21 @@
+---
+- name: Convert
+  ansible.builtin.set_fact:
+    backup__create_dirs__input: >-
+      {{
+        backup__create_dirs__input |
+        default([]) + append
+      }}
+  loop: "{{ backup__create_dirs__convert_from_fstab_input }}"
+  vars:
+    root_dir_path: >-
+      {{ item.mount_root_dir_path }}/{{ item.partition_name }}"
+    backup_dir_name: "backup"
+    backup_dir_path: "{{ root_dir_path }}/{{ backup_dir_name }}"
+    append:
+      - root_dir_path: "{{ root_dir_path }}"
+        backup_dir_name: "{{ backup_dir_name }}"
+        backup_dir_path: "{{ backup_dir_path }}"
+        backup_dir_owner: "{{ item.backup_dir_owner }}"
+
+  

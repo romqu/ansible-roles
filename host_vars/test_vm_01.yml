@@ -66,42 +66,59 @@ zfs__create_dataset__data_list:
   - pool_name: "{{ zfs__create_pool__pool_name }}"
     dataset_name: "backup"
 
-backup__create_dirs__zfs_data_list_temp:
-  - root_dir_path: >-
-      {{ zfs__create_pool__mount_path }}/
-      {{- zfs__create_dataset__data_list[0].dataset_name }}
-    backup_dir_name: "backup"
-    backup_dir_path: >-
-      {{ zfs__create_pool__mount_path }}/
-      {{- zfs__create_dataset__data_list[0].dataset_name }}/backup
-    backup_dir_owner: "{{ shared__test_vm__username }}"
+# backup__create_dirs__zfs_data_list_temp:
+#   - root_dir_path: >-
+#       {{ zfs__create_pool__mount_path }}/
+#       {{- zfs__create_dataset__data_list[0].dataset_name }}
+#     backup_dir_name: "backup"
+#     backup_dir_path: >-
+#       {{ zfs__create_pool__mount_path }}/
+#       {{- zfs__create_dataset__data_list[0].dataset_name }}/backup
+#     backup_dir_owner: "{{ shared__test_vm__username }}"
+
+backup__create_dirs__convert_from_zfs_dataset_input: >-
+  {{ 
+    zfs__create_dataset__data_list |
+    map('combine', {
+      'backup_dir_owner': shared__test_vm__username,
+      'pool_mount_path': zfs__create_pool__mount_path
+     }
+    )
+  }}
 
 # belongs into a role/task
-backup__create_dirs__ext4_data_list_temp_0: >-
-  {% set ns = namespace(updated_json='',json_list=[]) %}
-  {% for item in fstab__add_entry__data_list %}
-    {% set root_dir_path =  item.mount_root_dir_path + "/" + item.partition_name %}
-    {% set backup_dir_name = "backup" %}
-    {% set backup_dir_path =  root_dir_path + "/" + backup_dir_name %}
-    {% set ns.updated_json =
-      {
-        'root_dir_path': root_dir_path,
-        'backup_dir_name': backup_dir_name,
-        'backup_dir_path': backup_dir_path,
-        'backup_dir_owner': shared__test_vm__username
-      }
-    %}
-    {% set _ = ns.json_list.append(ns.updated_json) %}
-  {% endfor %}
-  {{ ns.json_list }}
-backup__create_dirs__ext4_data_list_temp_1: >-
-  {{ backup__create_dirs__ext4_data_list_temp_0 | trim | to_json | from_yaml }}
-backup__create_dirs__data_list: >-
+# backup__create_dirs__ext4_data_list_temp_0: >-
+#   {% set ns = namespace(updated_json='',json_list=[]) %}
+#   {% for item in fstab__add_entry__data_list %}
+#     {% set root_dir_path =  item.mount_root_dir_path + "/" + item.partition_name %}
+#     {% set backup_dir_name = "backup" %}
+#     {% set backup_dir_path =  root_dir_path + "/" + backup_dir_name %}
+#     {% set ns.updated_json =
+#       {
+#         'root_dir_path': root_dir_path,
+#         'backup_dir_name': backup_dir_name,
+#         'backup_dir_path': backup_dir_path,
+#         'backup_dir_owner': shared__test_vm__username
+#       }
+#     %}
+#     {% set _ = ns.json_list.append(ns.updated_json) %}
+#   {% endfor %}
+#   {{ ns.json_list }}
+# backup__create_dirs__ext4_data_list_temp_1: >-
+#   {{ backup__create_dirs__ext4_data_list_temp_0 | trim | to_json | from_yaml }}
+# backup__create_dirs__input: >-
+#   {{ 
+#     backup__create_dirs__zfs_data_list_temp + 
+#     backup__create_dirs__ext4_data_list_temp_1
+#   }}
+
+backup__create_dirs__convert_from_fstab_input: >-
   {{ 
-    backup__create_dirs__zfs_data_list_temp + 
-    backup__create_dirs__ext4_data_list_temp_1
+    fstab__add_entry__data_list |
+    map('combine', {'backup_dir_owner': shared__test_vm__username })
   }}
 backup__create_dirs__main_dir_marker_file_name: "{{ host_uuid }}"
+
 backblaze_b2__bucket_name__main: "{{ ansible_hostname }}-main-{{ host_uuid }}"
 backblaze_b2__bucket_name__replication: "{{ ansible_hostname }}-replication-{{ host_uuid }}"
 
@@ -188,7 +205,7 @@ restic__docker_setup__repo_remote_dict:
       --keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75
 restic__docker_setup__repo_local_dict: >-
     {{
-      backup__create_dirs__ext4_data_list_temp_1 |
+      backup__create_dirs__input |
       ansible.utils.replace_keys(target=[
         {
           'before':'backup_dir_path',

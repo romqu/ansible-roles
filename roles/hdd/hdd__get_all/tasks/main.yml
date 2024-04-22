@@ -58,5 +58,5 @@
     awk '{ print $1 }' |
     xargs -I "{}" grep "{}" /etc/fstab |
     awk '{ print $2 }'
-  register: hdd__get_all__hdd_ext4_partiton_mount_dir_paths_result
+  register: hdd__get_all__ext4_partition_mount_dir_paths_result
   changed_when: true

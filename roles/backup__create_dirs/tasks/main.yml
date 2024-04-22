@@ -1,5 +1,5 @@
 ---
-- name: Create backup dir for {{ backup__create_dirs__data_list }}
+- name: Create backup dir for {{ backup__create_dirs__input }}
   become: true
   ansible.builtin.file:
     path: "{{ item.backup_dir_path }}"
@@ -7,7 +7,7 @@
     owner: "{{ item.backup_dir_owner }}"
     group: "{{ item.backup_dir_owner }}"
     mode: "0755"
-  loop: "{{ backup__create_dirs__data_list }}"
+  loop: "{{ backup__create_dirs__input }}"
 
 - name: Try find main backup dir
   ansible.builtin.find:
@@ -15,7 +15,7 @@
     file_type: file
     patterns: "{{ backup__create_dirs__main_dir_marker_file }}"
     hidden: true
-  loop: "{{ backup__create_dirs__data_list }}"
+  loop: "{{ backup__create_dirs__input }}"
   register: backup__create_dirs__main_dir_marker_file_result
 
 - name: Extract files from '{{ backup__create_dirs__main_dir_marker_file_result }}'
