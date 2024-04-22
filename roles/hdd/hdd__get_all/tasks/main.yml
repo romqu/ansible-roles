@@ -1,21 +1,4 @@
 ---
-# - name: Get disk with boot partition
-#   ansible.builtin.shell: lsblk -sdln -o NAME,MOUNTPOINT | awk '$2 == "/boot"' | awk '{ print $1 }' | sed 's/.$//'
-#   register: get_boot_disk_result
-#   changed_when: get_boot_disk_result.stdout_lines | length != 1
-
-# - name: Get disk(s) with mounted partition(s)
-#   ansible.builtin.shell: lsblk -sdlfn -o NAME,MOUNTPOINT,TYPE | awk 'NF!=2' | awk '$3 != "lvm"' | awk '{ print $1 }' | sed 's/[0-9]//g' | uniq
-#   register: get_disk_mounted_result
-#   changed_when: get_boot_disk_result.stdout_lines | length > 0
-
-#- name: Get disk(s) without 
-#  ansible.builtin.shell: lsblk -sdlfn -o NAME,MOUNTPOINT,TYPE | awk '$3 != "lvm"' | awk '{ print $1 }' | sed 's/[0-9]//g' | uniq --unique
-#  register: get_hard_drives__result
-#  changed_when: get_hard_drives__result.stdout_lines | length > 0
-#  when: get_hard_drives__unmounted
-
-
 - name: Get hdd(s) path(s)
   ansible.builtin.shell: >-
     lsblk -lnd -o PATH,TYPE,ROTA |
@@ -68,39 +51,12 @@
       }}
   when: item.partitions_total == 0
 
-
-
-#- name: Get hdd(s) without filesystem
-#  ansible.builtin.shell: >-
-#    lsblk -sdlfn -o NAME,ROTA,FSTYPE | awk '$2 == "1"' 
-#    | awk '$3 == ""' | awk '{ print $1 }' | sed 's/[0-9]//g' 
-#    | uniq --unique
-#  register: hdd__get_all__no_filesystem_result
-#  changed_when:
-#    hdd__get_all__no_filesystem_result.stdout_lines | length > 0
-#  when: hdd__get_all__no_filesystem
-
-#- name: Get hdd partition(s) with filesystem
-#  ansible.builtin.shell: >-
-#    lsblk -sdlfn -o NAME,FSTYPE,TYPE | awk '$1!~/sda/'
-#    | awk '$1~/sd/'
-#    | awk '$2 == "{{ hdd__get_all__with_filesystem_type }}"'
-#    | awk '{ print $1 }'
-#  register: hdd__get_all__with_filesystem_result
-#  changed_when:
-#    hdd__get_all__with_filesystem_result.stdout_lines | length > 0
-#  when: hdd__get_all__with_filesystem
-
-#- name: Set fact 'hdd__get_all__no_filesystem_result'
-#  ansible.builtin.set_fact:
-#    hdd__get_all__no_filesystem_result:
-#      "{{ hdd__get_all__no_filesystem_result.stdout_lines }}"
-#  when: hdd__get_all__no_filesystem
-
-#- name: Set fact 'hdd__get_all__with_filesystem_result'
-#  ansible.builtin.set_fact:
-#    hdd__get_all__with_filesystem_result: 
-#      "{{ hdd__get_all__with_filesystem_result.stdout_lines }}"
-#  when: hdd__get_all__with_filesystem
-
-#blkid -s UUID -o value /dev/sdc
+- name: Get ext4 hdd(s) partition(s) mount dir path
+  ansible.builtin.shell: >-
+    lsblk -ln -o name,fstype,type,rota |
+    awk '$2 == "ext4" && $4 == "1"' |
+    awk '{ print $1 }' |
+    xargs -I "{}" grep "{}" /etc/fstab |
+    awk '{ print $2 }'
+  register: hdd__get_all__hdd_ext4_partiton_mount_dir_paths_result
+  changed_when: true
