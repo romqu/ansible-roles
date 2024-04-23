@@ -1,0 +1,43 @@
+---
+- name: Create backup dir for {{ backup__create_dirs__input }}
+  become: true
+  ansible.builtin.file:
+    path: "{{ item.backup_dir_path }}"
+    state: directory
+    owner: "{{ item.backup_dir_owner }}"
+    group: "{{ item.backup_dir_owner }}"
+    mode: "0755"
+  loop: "{{ backup__create_dirs__input }}"
+
+- name: Try find main backup dir
+  ansible.builtin.find:
+    paths: "{{ item.backup_dir_path }}"
+    file_type: file
+    patterns: "{{ backup__create_dirs__main_dir_marker_file }}"
+    hidden: true
+  loop: "{{ backup__create_dirs__input }}"
+  register: backup__create_dirs__main_dir_marker_file_result
+
+- name: Extract files from '{{ backup__create_dirs__main_dir_marker_file_result }}'
+  ansible.builtin.set_fact:
+    backup__create_dirs__main_backup_dir_found_file_list: >-
+      {{ backup__create_dirs__main_backup_dir_found_file_list +
+        [files] | flatten
+      }}
+  loop: "{{ backup__create_dirs__main_dir_marker_file_result.results }}"
+  when: files | length > 0
+  vars:
+    files: "{{ item.files }}"
+
+- name: Mark main backup dir
+  when: >-
+    backup__create_dirs__main_backup_dir_found_file_list |
+    default([]) | length == 0
+  block:
+    - name: Mark main backup dir when no found {{ backup__create_dirs__main_backup_dir_path }}
+      ansible.builtin.file:
+        path: "{{ backup__create_dirs__main_backup_dir_path }}"
+        state: touch
+        owner: "{{ backup__create_dirs__main_backup_dir_owner }}"
+        group: "{{ backup__create_dirs__main_backup_dir_owner }}"
+        mode: "0644"

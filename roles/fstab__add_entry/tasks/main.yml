@@ -40,7 +40,11 @@
           {{ fstab__add_entry__load_automount | default([]) + [append] }}
       loop: "{{ fstab__add_entry__data_list }}"
       vars:
-        append: 
+        append:
           "{{ item.mount_root_dir_name }}-{{ item.partition_name }}.automount"
+      changed_when: true
+
+    - ansible.builtin.debug: msg="trigger load automount"
       notify: "load automount"
       changed_when: true
+

@@ -1,9 +1,9 @@
 ---
 - name: Convert
   ansible.builtin.set_fact:
-    backup__create_dirs__input: >-
+    backup__create_dirs__convert_from_zfs_dataset_output: >-
       {{
-        backup__create_dirs__input |
+        backup__create_dirs__convert_from_zfs_dataset_output |
         default([]) + append
       }}
   loop: "{{ backup__create_dirs__convert_from_zfs_dataset_input }}"
@@ -16,4 +16,11 @@
           {{ item.pool_mount_path }}/{{ item.dataset_name }}/backup
         backup_dir_owner: "{{ shared__test_vm__username }}"
 
-  
+- name: Append
+  ansible.builtin.set_fact:
+    backup__create_dirs__input: >-
+      {{
+        backup__create_dirs__input |
+        default([]) +
+        backup__create_dirs__convert_from_zfs_dataset_output
+      }}

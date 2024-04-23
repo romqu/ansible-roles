@@ -1,8 +1,8 @@
-backup__create_dirs__input:
-  - root_dir_path: null
-    backup_dir_name: null
-    backup_dir_path: null
-    backup_dir_owner: null
+# backup__create_dirs__input:
+#  - root_dir_path: null
+#    backup_dir_name: null
+#    backup_dir_path: null
+#    backup_dir_owner: null
 
 backup__create_dirs__main_dir_marker_file_name: null
 backup__create_dirs__main_dir_marker_file:

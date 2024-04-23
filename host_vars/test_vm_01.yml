@@ -197,7 +197,7 @@ restic__docker_setup__pushover_user_key: "{{ bitwarden__get_field__pushover_user
 restic__docker_setup__pushover_app_token: >-
   {{ bitwarden__get_field__pushover_restic_backup_app_token }}
 restic__docker_setup__backup_folder_path_host: >-
-  {{ backup__create_dirs__zfs_data_list_temp[0].backup_dir_path }}
+  {{ backup__create_dirs__convert_from_zfs_dataset_input[0].backup_dir_path }}
 restic__docker_setup__backup_folder_path_container: "/data"
 restic__docker_setup__repo_remote_dict:
   - repo: "s3:s3.eu-central-003.backblazeb2.com/testromqu"
