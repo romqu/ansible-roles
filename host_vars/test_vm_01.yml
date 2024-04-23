@@ -193,7 +193,7 @@ systemd__create_service__description: "restic-backup"
 systemd__create_service__group: "docker"
 systemd__create_service__exec_start: >-
   nice -n -0 ionice -c 2 -n 0 docker compose -f
-  "{{ restic__docker_setup__compose_file_path }}" up -
+  "{{ restic__docker_setup__compose_file_path }}" up
 
 systemd__create_timer__file_name: "{{ systemd__create_service__file_name }}"
 systemd__create_timer__description: "{{ systemd__create_service__description + ' timer' }}"
