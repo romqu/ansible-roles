@@ -1,3 +1,6 @@
 hdd__get_all__no_filesystem: true
 hdd__get_all__with_filesystem: true
 hdd__get_all__with_filesystem_type: "ext4"
+
+# hdd__get_all__ext4_partition_mount_dir_paths_result:
+  

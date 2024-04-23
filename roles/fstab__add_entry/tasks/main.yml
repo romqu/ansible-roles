@@ -44,7 +44,21 @@
           "{{ item.mount_root_dir_name }}-{{ item.partition_name }}.automount"
       changed_when: true
 
-    - ansible.builtin.debug: msg="trigger load automount"
-      notify: "load automount"
-      changed_when: true
+    - name: Reload systemd daemon
+      become: true
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+    - name: Restart cryptsetup
+      become: true
+      ansible.builtin.systemd:
+        state: restarted
+        name: cryptsetup.target
+
+    - name: Restart automount
+      become: true
+      ansible.builtin.systemd:
+        state: restarted
+        name: "{{ item }}"
+      loop: "{{ fstab__add_entry__load_automount }}"
 

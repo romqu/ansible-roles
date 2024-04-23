@@ -6,6 +6,10 @@
   ansible.builtin.include_tasks: convert_from_fstab.yml
   when: backup__create_dirs__convert_from_fstab_input is defined
 
+- name: Convert from ext4 partition list
+  ansible.builtin.include_tasks: convert_from_ext4_partitions.yml
+  when: backup__create_dirs__convert_from_ext4_partitions_input is defined
+
 - name: Create dirs
   ansible.builtin.include_tasks: create_dirs.yml
   when: backup__create_dirs__input is defined

@@ -10,5 +10,5 @@
   register: bitwarden__create_item__login_result
   loop: "{{ bitwarden__create_item__data_dict_list }}"
   when: item.type == 'login'
-  no_log: true
+  no_log: false
   
