@@ -7,7 +7,7 @@ caddy__docker_setup__external_network_name: "caddy-external-network"
 caddy__docker_setup__sub_configs_dir_name: "conf.d"
 caddy__docker_setup__sub_configs_dir_path: >-
   {{ caddy__docker_setup__dir_path }}/
-  {{ caddy__docker_setup__sub_configs_dir_name }}
+  {{- caddy__docker_setup__sub_configs_dir_name }}
 
 caddy__docker_setup__email:
 caddy__docker_setup__acme_ca_url: "https://acme-staging-v02.api.letsencrypt.org/directory"

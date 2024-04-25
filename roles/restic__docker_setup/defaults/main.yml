@@ -22,7 +22,7 @@ restic__docker_setup__group_id: "{{ ansible_facts.user_gid }}"
 #      "forget_args": "--keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75",
 #    }
 #  ]
-restic__docker_setup__repo_dict: >
+restic__docker_setup__repo_dict: >-
   {{ restic__docker_setup__repo_local_dict
       | zip(restic__docker_setup__repo_remote_dict)
       | flatten
