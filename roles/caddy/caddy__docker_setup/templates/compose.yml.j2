@@ -11,15 +11,15 @@ services:
     ports:
       - target: 80
         published: "80"
-        host_ip: "0.0.0.0"
+        host_ip: {{ caddy__docker_setup__ports_host_ip }}
         protocol: tcp
       - target: 443
         published: "443"
-        host_ip: "0.0.0.0"
+        host_ip: {{ caddy__docker_setup__ports_host_ip }}
         protocol: tcp
       - target: 443
         published: "443"
-        host_ip: "0.0.0.0"
+        host_ip: {{ caddy__docker_setup__ports_host_ip }}
         protocol: udp
     volumes:
       - type: bind
@@ -32,7 +32,7 @@ services:
         source: caddy_config
         target: "/config"
     networks:
-        caddy-network:
+        {{ caddy__docker_setup__external_network_name }}:
           ipv4_address: "172.168.10.2"
     labels:
       - docker-volume-backup.stop-during-backup=true
@@ -42,7 +42,7 @@ services:
     image: offen/docker-volume-backup:v2.38.1
     restart: always
     environment:
-      BACKUP_FILENAME: backup-caddy-%Y-%m-%dT%H-%M-%S.tar.gz
+      BACKUP_FILENAME: backup-caddy-data-%Y-%m-%dT%H-%M-%S.tar.gz
       BACKUP_LATEST_SYMLINK: backup-latest.tar.gz
     volumes:
       - caddy_data:/backup/my-app-backup:ro
@@ -50,12 +50,8 @@ services:
       - {{ caddy__docker_setup__data_backup_dir_path }}:/archive
 
 networks:
-  caddy-network:
-    name: caddy-network
-    ipam:
-      driver: default
-      config:
-        - subnet: "172.168.10.0/24"
+  {{ caddy__docker_setup__external_network_name }}:
+    external: true
 
 volumes:
   caddy_data:

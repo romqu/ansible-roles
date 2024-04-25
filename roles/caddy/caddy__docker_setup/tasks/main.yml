@@ -11,9 +11,19 @@
 - name: Copy templates
   ansible.builtin.template:
     src: "{{ item }}"
-    dest: "{{ caddy__docker_setup__dir_path }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
-  with_fileglob: 
+    dest: >-
+      {{ caddy__docker_setup__dir_path }}/
+      {{- item | basename | regex_replace('\\.j2$', '') }}
+  with_fileglob:
     - "templates/*.j2"
+
+- name: Create external caddy network
+  become: true
+  community.docker.docker_network:
+    name: "caddy-network"
+    driver: "bridge"
+    ipam_config:
+      - subnet: "172.168.10.0/24"
 
 - name: Start caddy container
   become: true
