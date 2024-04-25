@@ -3,7 +3,6 @@ services:
   restic:
     hostname: server
     container_name: restic-server
-    user: "{{ restic__docker_setup__user_id }}:{{ restic__docker_setup__group_id }}"
     build:
       context: .
       args:

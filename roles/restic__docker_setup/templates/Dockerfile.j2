@@ -13,7 +13,7 @@ RUN apk add --no-cache bash
 RUN apk add --no-cache curl
 
 WORKDIR "/root"
-RUN mkdir cache
+RUN mkdir .cache
 
 ADD --chmod=0755 restic-init.sh .
 ADD --chmod=0755 restic-backup.sh .
