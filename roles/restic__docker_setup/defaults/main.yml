@@ -1,30 +1,32 @@
 restic__docker_setup__dir_path: "{{ ansible_env.HOME }}/docker/restic"
 restic__docker_setup__compose_file_path: 
   "{{ restic__docker_setup__dir_path }}/compose.yml"
-restic__docker_setup__aws_access_key_id: ""
-restic__docker_setup__aws_secret_access_key: ""
-restic__docker_setup__restic_password: "a"
-restic__docker_setup__backup_folder_path_host: "/backup" # folder to backup (host bind)
-restic__docker_setup__backup_folder_path_container: "/data" # folder to backup (host bind)
-restic__docker_setup__repo_remote_dict:
-  [
-    {
-      "repo": "",
-      "forget_args": "--keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75",
-    }
-  ]
-restic__docker_setup__repo_local_dict:
-  [
-    {
-      "repo": "",
-      "forget_args": "--keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75",
-    }
-  ]
+restic__docker_setup__user_id: "{{ ansible_facts.user_uid }}"
+restic__docker_setup__group_id: "{{ ansible_facts.user_gid }}"
+# restic__docker_setup__aws_access_key_id:
+# restic__docker_setup__aws_secret_access_key:
+# restic__docker_setup__restic_password:
+# restic__docker_setup__backup_source_dir_path_host: # folder to backup (host bind)
+# restic__docker_setup__backup_source_dir_path_container: # folder to backup (host bind)
+# restic__docker_setup__repo_remote_dict:
+#  [
+#    {
+#      "repo": "",
+#      "forget_args": "--keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75",
+#    }
+#  ]
+# restic__docker_setup__repo_local_dict:
+#  [
+#    {
+#      "repo": "",
+#      "forget_args": "--keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75",
+#    }
+#  ]
 restic__docker_setup__repo_dict: >
   {{ restic__docker_setup__repo_local_dict
       | zip(restic__docker_setup__repo_remote_dict)
       | flatten
       | unique
   }}
-restic__docker_setup__pushover_user_key: ""
-restic__docker_setup__pushover_app_token: ""
+# restic__docker_setup__pushover_user_key:
+# restic__docker_setup__pushover_app_token:

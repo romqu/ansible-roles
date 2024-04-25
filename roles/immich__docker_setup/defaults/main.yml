@@ -1,4 +1,4 @@
-immich__docker_setup__immich_version: "v1.95.1"
+immich__docker_setup__immich_version: "v1.102.3"
 
 immich__docker_setup__user_id: null
 immich__docker_setup__group_id: null

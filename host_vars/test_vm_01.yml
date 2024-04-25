@@ -3,12 +3,19 @@ bitwarden__get_password__result: >-
     lookup('community.general.bitwarden', test_vm__bitwarden__item_name, field='password') |
     first 
   }}
+############################################################################
 
 ansible_become_pass: "{{ bitwarden__get_password__result }}"
 
+############################################################################
+
 sshd__setup_config__port: "{{ test_vm__ssh_port }}"
 
+############################################################################
+
 hdd__wipe__disk_paths: "{{ hdd__get_all__no_partitions_disk_paths_result }}"
+
+############################################################################
 
 luks__encrypt__disk_path_list: "{{ hdd__get_all__no_partitions_disk_paths_result }}"
 luks__encrypt__keyfile_file_name: "2a8b1716-97a3-4a29-b4f8-c429d74cf46f.key"
@@ -16,41 +23,57 @@ luks__encrypt__keyfile_dir_path: "/etc/cryptsetup-keys.d/"
 luks__encrypt__keyfile_file_path: >-
   {{ luks__encrypt__keyfile_dir_path }}{{ luks__encrypt__keyfile_file_name }}
 luks__encrypt__passphrase: "{{ bitwarden__get_password__result }}"
+
+############################################################################
+
 luks__open__disk_path_list: "{{ hdd__get_all__no_partitions_disk_paths_result }}"
 luks__open__keyfile_path: "{{ luks__encrypt__keyfile_file_path }}"
 
+############################################################################
+
+hdd__zfs_mirror_list: "{{ luks__open__disk_data_list_result[:2] }}"
+hdd__ext4_list: "{{ luks__open__disk_data_list_result[2:] }}"
+
+############################################################################
+
 zfs__create_pool__disk_path_list: >-
-  {{ luks__open__disk_data_list_result[:2] | map(attribute='partition_path') }}
+  {{ hdd__zfs_mirror_list | map(attribute='partition_path') }}
 zfs__create_pool__type: "mirror"
 zfs__create_pool__pool_name: "zdata"
 zfs__create_pool__mount_path: "/mnt/{{ zfs__create_pool__pool_name }}"
 
+############################################################################
+
 crypttab__add_entry__zfs_miror_disk_data_list: >-
   {{ 
-    luks__open__disk_data_list_result[:2] |
+    hdd__zfs_mirror_list |
     map('combine', {'options': ['luks','discard']})
   }}
 crypttab__add_entry__ext4_standalone_disk_data_list: >-
   {{ 
-    luks__open__disk_data_list_result[2:] |
+    hdd__ext4_list |
     map('combine', {'options': ['noauto','nofail']})
   }}
-
 crypttab__add_entry__disk_data_list: >-
   {{
     crypttab__add_entry__ext4_standalone_disk_data_list +
     crypttab__add_entry__zfs_miror_disk_data_list
   }}
 crypttab__add_entry__keyfile_file_path: "{{ luks__encrypt__keyfile_file_path }}"
+
+############################################################################
+
 hdd__create_filesystem__disk_data: >-
   {{ 
-    luks__open__disk_data_list_result[2:] |
+    hdd__ext4_list |
     map('combine', {'filesystem_type': 'ext4'})
   }}
 
+############################################################################
+
 fstab__add_entry__data_list: >-
   {{ 
-    luks__open__disk_data_list_result[2:] |
+    hdd__ext4_list |
     map('combine',
         {
           'partition_filesystem': 'ext4',
@@ -62,9 +85,13 @@ fstab__add_entry__data_list: >-
        )
   }}
 
+############################################################################
+
 zfs__create_dataset__data_list:
   - pool_name: "{{ zfs__create_pool__pool_name }}"
-    dataset_name: "backup"
+    dataset_name: "zbackup"
+
+############################################################################
 
 backup__create_dirs__convert_from_zfs_dataset_input: >-
   {{ 
@@ -85,10 +112,20 @@ backup__create_dirs__convert_from_ext4_partitions_input: >-
     hdd__get_all__ext4_partition_mount_dir_paths_result |
     map('combine', {'backup_dir_owner': shared__test_vm__username })
   }}
+
 backup__create_dirs__main_dir_marker_file_name: "{{ host_uuid }}"
+
+############################################################################
+
+backup__source_dir_path: >-
+  {{ backup__create_dirs__convert_from_zfs_dataset_output[0].backup_dir_path }}
+
+############################################################################
 
 backblaze_b2__bucket_name__main: "{{ ansible_hostname }}-main-{{ host_uuid }}"
 backblaze_b2__bucket_name__replication: "{{ ansible_hostname }}-replication-{{ host_uuid }}"
+
+############################################################################
 
 bitwarden_get_field__data_dict_list:
   - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_eu_master_key"
@@ -131,6 +168,8 @@ bitwarden_get_field__data_dict_list:
     bitwarden__get_field__entry_name: "pushover_restic_backup_app_token"
     bitwarden__get_field__field_name: "password"
 
+############################################################################
+
 backblaze_b2__setup_buckets__account_dict_list:
   - master_key_id: "{{ bitwarden__get_field__b2_eu_master_key_id }}"
     master_key: "{{ bitwarden__get_field__b2_eu_master_key }}"
@@ -146,6 +185,8 @@ backblaze_b2__setup_buckets__account_dict_list:
     bucket_key_id: "{{ bitwarden__get_field__b2_replication_key_id }}"
     bucket_key: "{{ bitwarden__get_field__b2_replication_key }}"
 
+############################################################################
+
 bitwarden__convert_backblaze_b2__input_dict_list: >-
   {{
     backblaze_b2__setup_buckets__result |
@@ -156,7 +197,11 @@ bitwarden__convert_backblaze_b2__input_dict_list: >-
        )
   }}
 
+############################################################################
+
 bitwarden__create_item__data_dict_list: "{{ bitwarden__convert_backblaze_b2__result }}"
+
+############################################################################
 
 restic__docker_setup__aws_access_key_id: "{{ bitwarden__get_field__b2_main_key_id }}"
 restic__docker_setup__aws_secret_access_key: "{{ bitwarden__get_field__b2_main_key }}"
@@ -164,43 +209,59 @@ restic__docker_setup__restic_password: "{{ bitwarden__get_password__result }}"
 restic__docker_setup__pushover_user_key: "{{ bitwarden__get_field__pushover_user_key }}"
 restic__docker_setup__pushover_app_token: >-
   {{ bitwarden__get_field__pushover_restic_backup_app_token }}
-restic__docker_setup__backup_folder_path_host: >-
-  {{ backup__create_dirs__convert_from_zfs_dataset_output[0].backup_dir_path }}
-restic__docker_setup__backup_folder_path_container: "/data"
+restic__docker_setup__backup_source_dir_path_host: "{{ backup__source_dir_path }}"
+restic__docker_setup__backup_source_dir_path_container: "/data"
 restic__docker_setup__repo_remote_dict:
-  - repo: "s3:s3.eu-central-003.backblazeb2.com/testromqu"
+  - repo: >-
+      s3:s3.eu-central-003.backblazeb2.com/{{ backblaze_b2__bucket_name__main }}
     forget_args: >-
       --keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75
 restic__docker_setup__repo_local_dict: >-
-    {{
-      (backup__create_dirs__convert_from_fstab_output | default([])) +
-      (backup__create_dirs__convert_from_ext4_partitions_output | default([])) |
-      ansible.utils.replace_keys(target=[
-        {
-          'before':'backup_dir_path',
-          'after':'repo'
-        }
-      ]) |
-      map('combine',
-        {
-          'forget_args': '--keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75'
-        }
-       )
-    }}
+  {{
+    (backup__create_dirs__convert_from_fstab_output | default([])) +
+    (backup__create_dirs__convert_from_ext4_partitions_output | default([])) |
+    ansible.utils.replace_keys(target=[
+      {
+        'before':'backup_dir_path',
+        'after':'repo'
+      }
+    ]) |
+    map('combine',
+      {
+        'forget_args': '--keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75'
+      }
+     )
+  }}
+
+############################################################################
 
 systemd__create_service__file_name: "restic-backup"
 systemd__create_service__description: "restic-backup"
 systemd__create_service__group: "docker"
 systemd__create_service__exec_start: >-
   nice -n -0 ionice -c 2 -n 0 docker compose -f
-  "{{ restic__docker_setup__compose_file_path }}" up
+  {{ restic__docker_setup__compose_file_path }} up -d
+
+############################################################################
 
 systemd__create_timer__file_name: "{{ systemd__create_service__file_name }}"
 systemd__create_timer__description: "{{ systemd__create_service__description + ' timer' }}"
 systemd__create_timer__unit: "{{ systemd__create_service__file }}"
 systemd__create_timer__on_calendar: "*-*-* 12:00:00"
+
 ############################################################################################################
-#
+
+# caddy__docker_setup__dir_path: "/home/roman/docker/caddy/"
+# caddy__docker_setup__data_backup_dir_path: "/home/roman/docker/caddy/backup"
+# caddy__docker_setup__sub_configs_dir_name: "conf.d"
+# caddy__docker_setup__sub_configs_dir_path:
+#   "{{ caddy__docker_setup__dir_path }}/{{ caddy__docker_setup__sub_configs_dir_name }}"
+# caddy__docker_setup__email: "caddy@romqu.de"
+# caddy__docker_setup__acme_ca_url: "https://acme-staging-v02.api.letsencrypt.org/directory"
+
+############################################################################################################
+############################################################################################################
+
 # immich__docker_setup__dir_path: "/home/roman/docker/immich/"
 # immich__docker_setup__config_file_path: "/home/roman/docker/immich/immich.config"
 # immich__docker_setup__postgres_db_password: "a"
@@ -213,22 +274,22 @@ systemd__create_timer__on_calendar: "*-*-* 12:00:00"
 # immich__docker_setup__ports_host_ip: "0.0.0.0"
 # immich__docker_setup__user_id: "{{ ansible_facts.user_uid }}"
 # immich__docker_setup__group_id: "{{ ansible_facts.user_gid }}"
-#
-# caddy__docker_setup__dir_path: "/home/roman/docker/caddy/"
-# caddy__docker_setup__data_backup_dir_path: "/home/roman/docker/caddy/backup"
-# caddy__docker_setup__sub_configs_dir_name: "conf.d"
-# caddy__docker_setup__sub_configs_dir_path:
-#   "{{ caddy__docker_setup__dir_path }}/{{ caddy__docker_setup__sub_configs_dir_name }}"
-# caddy__docker_setup__email: "caddy@romqu.de"
-# caddy__docker_setup__acme_ca_url: "https://acme-staging-v02.api.letsencrypt.org/directory"
+
+
 # caddy__add_site__sub_configs_dir_path: "{{ caddy__docker_setup__sub_configs_dir_path }}"
 # caddy__add_site__file_name: "test"
 # caddy__add_site__tls_enabled: false
 # caddy__add_site__domain_name: ""
-#
+
+############################################################################################################
+
+
 # tailscale__docker_setup__dir_path: "/home/roman/docker/tailscale/"
 # tailscale__docker_setup__auth_key:
 #   ""
+
+############################################################################################################
+
 
 # sudo zpool destroy zdata
 # sudo cryptsetup close sdb0_crypt

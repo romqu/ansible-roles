@@ -5,7 +5,7 @@ set -o pipefail
 readonly pushover_user_key="{{ restic__docker_setup__pushover_user_key }}"
 readonly pushover_token="{{ restic__docker_setup__pushover_app_token }}"
 
-readonly backup_folder_path="{{ restic__docker_setup__backup_folder_path_container }}"
+readonly backup_folder_path="{{ restic__docker_setup__backup_source_dir_path_container }}"
 
 declare -rA repo_map=(
 {% for dict_item in restic__docker_setup__repo_dict %}

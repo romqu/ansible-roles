@@ -1,7 +1,9 @@
+# sudo docker compose exec restic ash
 services:
   restic:
     hostname: server
     container_name: restic-server
+    user: "{{ restic__docker_setup__user_id }}:{{ restic__docker_setup__group_id }}"
     build:
       context: .
       args:
@@ -13,8 +15,8 @@ services:
         source: cache
         target: "/root/.cache"
       - type: bind
-        source: "{{ restic__docker_setup__backup_folder_path_host }}"
-        target: "{{ restic__docker_setup__backup_folder_path_container }}"
+        source: "{{ restic__docker_setup__backup_source_dir_path_host }}"
+        target: "{{ restic__docker_setup__backup_source_dir_path_container }}"
         read_only: true
 {% for dict_item in restic__docker_setup__repo_local_dict %}
       - type: bind
@@ -24,5 +26,3 @@ services:
 
 volumes:
   cache:
-
-# sudo docker compose exec restic ash
