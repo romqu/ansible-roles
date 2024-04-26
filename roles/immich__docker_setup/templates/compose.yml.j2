@@ -12,7 +12,7 @@ name: immich
 
 services:
   immich-server:
-    container_name: immich_server
+    container_name: {{ immich__docker_setup__server_container_name }}
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
     user: ${IMMICH_USER_ID}:${IMMICH_GROUP_ID}
     command: [ "start.sh", "immich" ]
@@ -26,14 +26,12 @@ services:
       - /etc/localtime:/etc/localtime:ro
     env_file:
       - .env
-    #ports:
-    #  - target: 3001
-    #    host_ip: ${DOCKER_PORTS_HOST_IP}
-    #    published: "2283"
+    expose:
+      - {{ immich__docker_setup__server_container_exposed_port }}
     networks:
-      immich-network:
+      {{ immich__docker_setup__internal_network_name }}:
         ipv4_address: "172.168.20.2"
-      caddy-network:
+      {{ immich__docker_setup__external_network_name }}:
     depends_on:
       - redis
       - database
@@ -59,7 +57,7 @@ services:
     env_file:
       - .env
     networks:
-        immich-network:
+      {{ immich__docker_setup__internal_network_name }}:
           ipv4_address: "172.168.20.3"
     depends_on:
       - redis
@@ -86,7 +84,7 @@ services:
     env_file:
       - .env
     networks:
-        immich-network:
+      {{ immich__docker_setup__internal_network_name }}:
           ipv4_address: "172.168.20.4"
     restart: always
 
@@ -94,7 +92,7 @@ services:
     container_name: immich_redis
     image: registry.hub.docker.com/library/redis:6.2-alpine@sha256:84882e87b54734154586e5f8abd4dce69fe7311315e2fc6d67c29614c8de2672
     networks:
-        immich-network:
+      {{ immich__docker_setup__internal_network_name }}:
           ipv4_address: "172.168.20.5"
     restart: always
 
@@ -110,7 +108,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
-        immich-network:
+      {{ immich__docker_setup__internal_network_name }}:
           ipv4_address: "172.168.20.6"
     restart: always
 
@@ -128,7 +126,7 @@ services:
     volumes:
       - ${DB_BACKUP_DIR_PATH}:/backups
     networks:
-        immich-network:
+      {{ immich__docker_setup__internal_network_name }}:
           ipv4_address: "172.168.20.7"
     depends_on:
       - database
@@ -140,8 +138,8 @@ volumes:
   reverse-geocoding-dump:
 
 networks:
-  immich-network:
-    name: immich-network
+  {{ immich__docker_setup__internal_network_name }}:
+    name: {{ immich__docker_setup__internal_network_name }}
     internal: true
     ipam:
       driver: default

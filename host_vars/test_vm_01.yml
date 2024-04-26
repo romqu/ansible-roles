@@ -274,6 +274,8 @@ caddy__docker_setup__acme_ca_url: "https://acme-staging-v02.api.letsencrypt.org/
 
 immich__docker_setup__dir_path: "{{ docker__base_dir_path }}/immich"
 immich__docker_setup__config_file_path: "{{ immich__docker_setup__dir_path }}/immich.config"
+immich__docker_setup__server_container_name: "immich_server"
+immich__docker_setup__server_container_exposed_port: "3001"
 immich__docker_setup__postgres_db_password: "{{ bitwarden__get_password__result }}"
 immich__docker_setup__postgres_backup_dir_path: "{{ backup__source_dir_path }}/immich/pg-backup"
 immich__docker_setup__upload_dir_path: "{{ immich__docker_setup__dir_path }}/upload"
@@ -284,13 +286,14 @@ immich__docker_setup__encoded_video_dir_path: "{{ immich__docker_setup__dir_path
 immich__docker_setup__ports_host_ip: "0.0.0.0"
 immich__docker_setup__user_id: "{{ ansible_facts.user_uid }}"
 immich__docker_setup__group_id: "{{ ansible_facts.user_gid }}"
+immich__docker_setup__internal_network_name: "immich_internal_network"
 immich__docker_setup__external_network_name: >-
   {{ caddy__docker_setup__external_network_name }}
 
 ############################################################################################################
 
 # caddy__add_site__sub_configs_dir_path: "{{ caddy__docker_setup__sub_configs_dir_path }}"
-# caddy__add_site__file_name: "test"
+# caddy__add_site__file_name: "immich"
 # caddy__add_site__tls_enabled: false
 # caddy__add_site__domain_name: ""
 

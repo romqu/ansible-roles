@@ -13,3 +13,10 @@
     - "templates/.*.j2"
   vars:
     file_name: "{{ item | basename | regex_replace('\\.j2$', '') }}"
+
+- name: Start immich compose
+
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: "{{ immich__docker_setup__dir_path }}"
+    state: present
