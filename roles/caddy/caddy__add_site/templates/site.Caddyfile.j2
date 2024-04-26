@@ -1,3 +1,3 @@
-{{ 'https' if caddy__add_site__tls_enabled else 'http' }}://{{ caddy__add_site__domain_name }} {
-	respond "Hello world!"
+{{ 'https' if item.tls_enabled else 'http' }}://{{ item.domain_name }} {
+	reverse_proxy {{ item.reverse_proxy.upstream_address }}
 }

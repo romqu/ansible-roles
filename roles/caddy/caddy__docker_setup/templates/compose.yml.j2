@@ -1,6 +1,6 @@
 services:
   caddy:
-    container_name: caddy
+    container_name: {{ caddy__docker_setup__container_name }}
     build:
       context: .
     restart: unless-stopped

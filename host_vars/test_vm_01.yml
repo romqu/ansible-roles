@@ -149,11 +149,11 @@ bitwarden_get_field__data_dict_list:
     bitwarden__get_field__field_name: "username"
 
   - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_main_key"
-    bitwarden__get_field__entry_name: "{{backblaze_b2__bucket_name__main }}"
+    bitwarden__get_field__entry_name: "{{ backblaze_b2__bucket_name__main }}"
     bitwarden__get_field__field_name: "password"
 
   - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_replication_key_id"
-    bitwarden__get_field__entry_name: "{{backblaze_b2__bucket_name__replication }}"
+    bitwarden__get_field__entry_name: "{{ backblaze_b2__bucket_name__replication }}"
     bitwarden__get_field__field_name: "username"
 
   - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_replication_key"
@@ -165,6 +165,10 @@ bitwarden_get_field__data_dict_list:
     bitwarden__get_field__field_name: "password"
 
   - bitwarden__get_field__fact_name: "bitwarden__get_field__pushover_restic_backup_app_token"
+    bitwarden__get_field__entry_name: "pushover_restic_backup_app_token"
+    bitwarden__get_field__field_name: "password"
+
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__hetzner_api_token"
     bitwarden__get_field__entry_name: "pushover_restic_backup_app_token"
     bitwarden__get_field__field_name: "password"
 
@@ -258,6 +262,7 @@ systemd__create_timer__on_calendar: "*-*-* 12:00:00"
 
 ############################################################################################################
 
+caddy__docker_setup__container_name: "caddy"
 caddy__docker_setup__ports_host_ip: "0.0.0.0"
 caddy__docker_setup__external_network_name: "caddy_external_network"
 caddy__docker_setup__dir_path: "{{ docker__base_dir_path }}/caddy"
@@ -292,16 +297,27 @@ immich__docker_setup__external_network_name: >-
 
 ############################################################################################################
 
-# caddy__add_site__sub_configs_dir_path: "{{ caddy__docker_setup__sub_configs_dir_path }}"
-# caddy__add_site__file_name: "immich"
-# caddy__add_site__tls_enabled: false
-# caddy__add_site__domain_name: ""
+domain__name: "schaunis.at"
 
 ############################################################################################################
 
-# tailscale__docker_setup__dir_path: "/home/roman/docker/tailscale/"
-# tailscale__docker_setup__auth_key:
-#   ""
+caddy__add_site__container_name: "{{ caddy__docker_setup__container_name }}"
+caddy__add_site__sub_configs_dir_path: "{{ caddy__docker_setup__sub_configs_dir_path }}"
+caddy__docker_setup__acme_dns_hetzner_api_token: "R5pAoQQwDb77AQS88PQ2jN0EHYrXDdf8"
+
+caddy__add_site__site_list:
+  - file_name: "immich.conf"
+    tls_enabled: true
+    domain_name: "immich.{{ domain__name }}"
+    reverse_proxy:
+      upstream_address: >-
+        {{ immich__docker_setup__server_container_name }}:
+        {{- immich__docker_setup__server_container_exposed_port }}
+
+############################################################################################################
+
+tailscale__docker_setup__dir_path: "{{ docker__base_dir_path }}/tailscale"
+tailscale__docker_setup__auth_key: "tskey-auth-kr3i9c4P5F11CNTRL-vFkFgCnPpwWPWXyZDwCeyWCRv5Rxwpe8U"
 
 ############################################################################################################
 

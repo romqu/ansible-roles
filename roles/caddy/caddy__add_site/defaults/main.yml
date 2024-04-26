@@ -1,7 +1,11 @@
-caddy__add_site__sub_configs_dir_path: null
-caddy__add_site__file_name: null
+# caddy__add_site__container_name:
+# caddy__add_site__sub_configs_dir_path:
 
-caddy__add_site__container_name: "caddy"
-
-caddy__add_site__tls_enabled: false
-caddy__add_site__domain_name: null
+# caddy__add_site__site_list:
+#   - file_name: "immich"
+#     tls_enabled: true
+#     domain_name: "immich.home"
+#     reverse_proxy:
+#       upstream_address: >-
+#         {{ immich__docker_setup__server_container_name }}:
+#         {{- immich__docker_setup__server_container_exposed_port }}
