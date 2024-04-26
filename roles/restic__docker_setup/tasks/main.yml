@@ -7,10 +7,10 @@
 - name: Copy templates
   ansible.builtin.template:
     src: "{{ item }}"
-    dest: >-
-      {{ restic__docker_setup__dir_path }}/
-      {{- item | basename | regex_replace('\\.j2$', '') }}
+    dest: "{{ restic__docker_setup__dir_path }}/{{ file_name }}"
   with_fileglob: "templates/*.j2"
+  vars:
+    file_name: "{{ item | basename | regex_replace('\\.j2$', '') }}"
 
 - name: Build and run once
   become: true

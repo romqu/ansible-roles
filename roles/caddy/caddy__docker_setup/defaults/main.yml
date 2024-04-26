@@ -1,7 +1,5 @@
 caddy__docker_setup__version: "2.7.6"
 
-caddy__docker_setup__config_dir_path:
-
 caddy__docker_setup__external_network_name: "caddy-external-network"
 
 caddy__docker_setup__sub_configs_dir_name: "conf.d"

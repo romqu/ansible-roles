@@ -223,8 +223,10 @@ restic__docker_setup__repo_remote_dict:
       --keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75
 restic__docker_setup__repo_local_dict: >-
   {{
-    (backup__create_dirs__convert_from_fstab_output | default([])) +
-    (backup__create_dirs__convert_from_ext4_partitions_output | default([])) |
+    (
+      (backup__create_dirs__convert_from_fstab_output | default([])) +
+      (backup__create_dirs__convert_from_ext4_partitions_output | default([]))
+    ) |
     ansible.utils.replace_keys(target=[
       {
         'before':'backup_dir_path',
@@ -256,9 +258,11 @@ systemd__create_timer__on_calendar: "*-*-* 12:00:00"
 
 ############################################################################################################
 
+
 caddy__docker_setup__ports_host_ip: "0.0.0.0"
-caddy__docker_setup__external_network_name: "caddy-external-network"
+caddy__docker_setup__external_network_name: "caddy_external_network"
 caddy__docker_setup__dir_path: "{{ docker__base_dir_path }}/caddy"
+caddy__docker_setup__config_file_path: "{{ caddy__docker_setup__dir_path }}/Caddyfile"
 caddy__docker_setup__data_backup_dir_path: "{{ backup__source_dir_path }}/caddy/data"
 caddy__docker_setup__sub_configs_dir_name: "conf.d"
 caddy__docker_setup__sub_configs_dir_path: >-
@@ -269,19 +273,22 @@ caddy__docker_setup__acme_ca_url: "https://acme-staging-v02.api.letsencrypt.org/
 
 ############################################################################################################
 
-# immich__docker_setup__dir_path: "/home/roman/docker/immich/"
-# immich__docker_setup__config_file_path: "/home/roman/docker/immich/immich.config"
-# immich__docker_setup__postgres_db_password: "a"
-# immich__docker_setup__postgres_backup_dir_path: "/home/roman/docker/immich/pg-backup"
-# immich__docker_setup__upload_dir_path: "/home/roman/docker/immich/upload"
-# immich__docker_setup__library_dir_path: "/home/roman/docker/immich/library"
-# immich__docker_setup__thumbs_dir_path: "/home/roman/docker/immich/thumbs"
-# immich__docker_setup__profile_dir_path: "/home/roman/docker/immich/profile"
-# immich__docker_setup__encoded_video_dir_path: "/home/roman/docker/immich/encoded-video"
-# immich__docker_setup__ports_host_ip: "0.0.0.0"
-# immich__docker_setup__user_id: "{{ ansible_facts.user_uid }}"
-# immich__docker_setup__group_id: "{{ ansible_facts.user_gid }}"
+immich__docker_setup__dir_path: "{{ docker__base_dir_path }}/immich"
+immich__docker_setup__config_file_path: "{{ immich__docker_setup__dir_path }}/immich.config"
+immich__docker_setup__postgres_db_password: "{{ bitwarden__get_password__result }}"
+immich__docker_setup__postgres_backup_dir_path: "{{ backup__source_dir_path }}/immich/pg-backup"
+immich__docker_setup__upload_dir_path: "{{ immich__docker_setup__dir_path }}/upload"
+immich__docker_setup__library_dir_path: "{{ backup__source_dir_path }}/immich/library"
+immich__docker_setup__thumbs_dir_path: "{{ immich__docker_setup__dir_path }}/thumbs"
+immich__docker_setup__profile_dir_path: "{{ backup__source_dir_path }}/immich/profile"
+immich__docker_setup__encoded_video_dir_path: "{{ immich__docker_setup__dir_path }}/encoded-video"
+immich__docker_setup__ports_host_ip: "0.0.0.0"
+immich__docker_setup__user_id: "{{ ansible_facts.user_uid }}"
+immich__docker_setup__group_id: "{{ ansible_facts.user_gid }}"
+immich__docker_setup__external_network_name: >-
+  {{ caddy__docker_setup__external_network_name }}
 
+############################################################################################################
 
 # caddy__add_site__sub_configs_dir_path: "{{ caddy__docker_setup__sub_configs_dir_path }}"
 # caddy__add_site__file_name: "test"

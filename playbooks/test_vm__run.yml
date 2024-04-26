@@ -5,20 +5,20 @@
     PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
   vars:
   #ansible_python_interpreter: "/Users/roman/projects/personal/ansible-server-config/venv/bin/python"
-  # tasks:
-  #   - name: All sudo without pw
-  #     become: true
-  #     community.general.sudoers:
-  #       name: all-sudo
-  #       user: roman
-  #       commands: ALL
-  #       nopassword: true
+  tasks:
+    - name: All sudo without pw
+      become: true
+      community.general.sudoers:
+        name: all-sudo
+        user: roman
+        commands: ALL
+        nopassword: true
 
-  #   - name: Install foot-terminfo
-  #     become: true
-  #     ansible.builtin.apt:
-  #       name: foot-terminfo
-  #       state: present
+    - name: Install foot-terminfo
+      become: true
+      ansible.builtin.apt:
+        name: foot-terminfo
+        state: present
 
   roles:
     # - role: sshd__setup_config
@@ -33,7 +33,7 @@
     # - role: hdd/hdd__create_filesystem
     # - role: fstab__add_entry
     - role: backup__create_dirs
-    # - role: bitwarden/bitwarden__get_field
+    - role: bitwarden/bitwarden__get_field
     # - role: backblaze_b2__setup_buckets
     # - role: bitwarden__convert_backblaze_b2
     # - role: bitwarden/bitwarden__create_item
@@ -43,5 +43,6 @@
     # - role: systemd__create_service
     # - role: systemd__create_timer
     - role: caddy/caddy__docker_setup
+    - role: immich__docker_setup
     # - role: caddy/caddy__add_site
     # - role: tailscale__docker_setup
