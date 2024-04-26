@@ -53,9 +53,6 @@ services:
 networks:
   {{ caddy__docker_setup__external_network_name }}:
     external: true
-  default:
-    external: true
-    name: none
 
 volumes:
   caddy_data:
