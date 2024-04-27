@@ -30,8 +30,7 @@ services:
         source: caddy_config
         target: "/config"
     networks:
-        {{ caddy__docker_setup__external_network_name }}:
-          ipv4_address: "172.168.10.2"
+        - {{ caddy__docker_setup__external_network_name }}
     labels:
       - docker-volume-backup.stop-during-backup=true
 
@@ -47,8 +46,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - {{ caddy__docker_setup__data_backup_dir_path }}:/archive
     networks:
-        {{ caddy__docker_setup__external_network_name }}:
-          ipv4_address: "172.168.10.3"
+        - {{ caddy__docker_setup__external_network_name }}
 
 networks:
   {{ caddy__docker_setup__external_network_name }}:

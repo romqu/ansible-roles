@@ -22,8 +22,6 @@
   community.docker.docker_network:
     name: "{{ caddy__docker_setup__external_network_name }}"
     driver: "bridge"
-    ipam_config:
-      - subnet: "172.168.10.0/24"
 
 - name: Start caddy container
   become: true

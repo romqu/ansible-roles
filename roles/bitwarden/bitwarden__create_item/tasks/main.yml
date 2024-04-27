@@ -5,10 +5,10 @@
     name: "{{ item.name }}"
     username: "{{ item.username }}"
     password: "{{ item.password }}"
-    folder_name: "{{ item.folder_name }}"
+    folder_name: "{{ item.folder_name | default('') }}"
     folder_id: "{{ item.folder_id | default('') }}"
   register: bitwarden__create_item__login_result
   loop: "{{ bitwarden__create_item__data_dict_list }}"
   when: item.type == 'login'
   no_log: false
-  
+

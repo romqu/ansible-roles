@@ -18,7 +18,7 @@ qemu-system-x86_64 \
 -cpu host \
 -smp 2 \
 \
--netdev user,id=net0,net={{ vm__start_debian__vm_net }},dhcpstart={{ vm__start_debian__vm_dhcp_start_address }},hostfwd=tcp::22-:22 \
+-netdev user,id=net0,net={{ vm__start_debian__vm_net }},dhcpstart={{ vm__start_debian__vm_dhcp_start_address }},hostfwd=tcp::22-:22,hostfwd=tcp::80-:80,hostfwd=tcp::443-:443,hostfwd=udp::443-:443 \
 -device virtio-net-pci,netdev=net0 \
 \
 -drive id=drive0,file={{ vm__start_debian__vm_tmp_image_file_path }},format={{ vm__start_debian__vm_image_format }},if=none \

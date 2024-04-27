@@ -17,6 +17,9 @@
         backup_dir_path: "{{ backup_dir_path }}"
         backup_dir_owner: "{{ item.backup_dir_owner }}"
 
+- name: print
+  debug:
+    var: backup__create_dirs__convert_from_ext4_partitions_output
 
 - name: Append
   ansible.builtin.set_fact:

@@ -1,7 +1,7 @@
 bitwarden__get_password__result: >-
-  {{ 
+  {{
     lookup('community.general.bitwarden', test_vm__bitwarden__item_name, field='password') |
-    first 
+    first
   }}
 
 ############################################################################
@@ -169,7 +169,7 @@ bitwarden_get_field__data_dict_list:
     bitwarden__get_field__field_name: "password"
 
   - bitwarden__get_field__fact_name: "bitwarden__get_field__hetzner_api_token"
-    bitwarden__get_field__entry_name: "pushover_restic_backup_app_token"
+    bitwarden__get_field__entry_name: "hetzner_api_token"
     bitwarden__get_field__field_name: "password"
 
 ############################################################################
@@ -274,6 +274,7 @@ caddy__docker_setup__sub_configs_dir_path: >-
   {{- caddy__docker_setup__sub_configs_dir_name }}
 caddy__docker_setup__email: "caddy@romqu.de"
 caddy__docker_setup__acme_ca_url: "https://acme-staging-v02.api.letsencrypt.org/directory"
+caddy__docker_setup__acme_dns_hetzner_api_token: "{{ bitwarden__get_field__hetzner_api_token }}"
 
 ############################################################################################################
 
@@ -303,7 +304,6 @@ domain__name: "schaunis.at"
 
 caddy__add_site__container_name: "{{ caddy__docker_setup__container_name }}"
 caddy__add_site__sub_configs_dir_path: "{{ caddy__docker_setup__sub_configs_dir_path }}"
-caddy__docker_setup__acme_dns_hetzner_api_token: "R5pAoQQwDb77AQS88PQ2jN0EHYrXDdf8"
 
 caddy__add_site__site_list:
   - file_name: "immich.conf"
@@ -317,7 +317,7 @@ caddy__add_site__site_list:
 ############################################################################################################
 
 tailscale__docker_setup__dir_path: "{{ docker__base_dir_path }}/tailscale"
-tailscale__docker_setup__auth_key: "tskey-auth-kr3i9c4P5F11CNTRL-vFkFgCnPpwWPWXyZDwCeyWCRv5Rxwpe8U"
+tailscale__docker_setup__auth_key: "tskey-auth-km4PddxQuA21CNTRL-Gpbp1exqJhco8GgBahpggcG15kJMGC8EQ"
 
 ############################################################################################################
 
