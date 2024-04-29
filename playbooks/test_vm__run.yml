@@ -21,28 +21,28 @@
         state: present
 
   roles:
-    - role: sshd__setup_config
-    - role: hdd/hdd__get_all
-    - role: hdd/hdd__wipe
-    - role: luks/luks__encrypt
-    - role: luks/luks__open
-    - role: zfs/zfs__install
-    - role: zfs/zfs__create_pool
-    - role: crypttab__add_entry
-    - role: zfs/zfs__create_dataset
-    - role: hdd/hdd__create_filesystem
-    - role: fstab__add_entry
-    - role: backup__create_dirs
-    - role: bitwarden/bitwarden__get_field
-    - role: backblaze_b2__setup_buckets
-    - role: bitwarden__convert_backblaze_b2
-    - role: bitwarden/bitwarden__create_item
-      delegate_to: localhost
-    - role: docker__install
-    - role: restic__docker_setup
-    - role: systemd__create_service
-    - role: systemd__create_timer
-    - role: caddy/caddy__docker_setup
-    - role: immich__docker_setup
-    - role: caddy/caddy__add_site
+    # - role: sshd__setup_config
+    # - role: hdd/hdd__get_all
+    # - role: hdd/hdd__wipe
+    # - role: luks/luks__encrypt
+    # - role: luks/luks__open
+    # - role: zfs/zfs__install
+    # - role: zfs/zfs__create_pool
+    # - role: crypttab__add_entry
+    # - role: zfs/zfs__create_dataset
+    # - role: hdd/hdd__create_filesystem
+    # - role: fstab__add_entry
+    # - role: backup__create_dirs
+    # - role: bitwarden/bitwarden__get_field
+    # - role: backblaze_b2__setup_buckets
+    # - role: bitwarden__convert_backblaze_b2
+    # - role: bitwarden/bitwarden__create_item
+    #   delegate_to: localhost
+    # - role: docker__install
+    # - role: restic__docker_setup
+    # - role: systemd__create_service
+    # - role: systemd__create_timer
+    # - role: caddy/caddy__docker_setup
+    # - role: immich__docker_setup
+    # - role: caddy/caddy__add_site
     - role: tailscale__docker_setup
