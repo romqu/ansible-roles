@@ -6,6 +6,16 @@
   loop:
     - "{{ tailscale__docker_setup__dir_path }}"
 
+- ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: true
+    state: present
+    reload: true
+  loop:
+    - net.ipv4.ip_forward
+    - net.ipv6.conf.all.forwarding
+
 - name: Copy templates
   ansible.builtin.template:
     src: "compose.yml.j2"

@@ -24,6 +24,7 @@ luks__encrypt__keyfile_dir_path: "/etc/cryptsetup-keys.d/"
 luks__encrypt__keyfile_file_path: >-
   {{ luks__encrypt__keyfile_dir_path }}{{ luks__encrypt__keyfile_file_name }}
 luks__encrypt__passphrase: "{{ bitwarden__get_password__result }}"
+
 ############################################################################
 
 luks__open__disk_path_list: "{{ hdd__get_all__no_partitions_disk_paths_result }}"
@@ -318,6 +319,7 @@ caddy__add_site__site_list:
 
 tailscale__docker_setup__dir_path: "{{ docker__base_dir_path }}/tailscale"
 tailscale__docker_setup__auth_key: "tskey-auth-km4PddxQuA21CNTRL-Gpbp1exqJhco8GgBahpggcG15kJMGC8EQ"
+tailscale__docker_setup__extra_args: "--advertise-routes=192.168.88.0/24"
 
 ############################################################################################################
 
