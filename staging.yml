@@ -5,4 +5,4 @@ test_vm:
       ansible_connection: local
       ansible_python_interpreter: "/home/roman/projects/personal/ansible-roles/.venv/bin/python"
     test_vm_01:
-      host_uuid: "3cad9bc6-b8a3-4aa6-9d79-2defad69a7a8"
+      host_uuid: "dcdbb7d7-3153-4bf2-873e-feacfed62104"

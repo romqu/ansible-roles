@@ -212,9 +212,21 @@ docker__base_dir_path: "{{ ansible_env.HOME }}/docker"
 
 ############################################################################
 
+backblaze_b2__main_bucket: "{{ backblaze_b2__setup_buckets__result[0] }}"
+
+############################################################################
+
 restic__docker_setup__dir_path: "{{ docker__base_dir_path }}/restic"
-restic__docker_setup__aws_access_key_id: "{{ bitwarden__get_field__b2_main_key_id }}"
-restic__docker_setup__aws_secret_access_key: "{{ bitwarden__get_field__b2_main_key }}"
+restic__docker_setup__aws_access_key_id: >-
+  {{
+    bitwarden__get_field__b2_main_key_id |
+    default(backblaze_b2__main_bucket.bucket_key_id, true)
+  }}
+restic__docker_setup__aws_secret_access_key: >-
+  {{
+    bitwarden__get_field__b2_main_key |
+    default(backblaze_b2__main_bucket.bucket_key, true)
+  }}
 restic__docker_setup__restic_password: "{{ bitwarden__get_password__result }}"
 restic__docker_setup__pushover_user_key: "{{ bitwarden__get_field__pushover_user_key }}"
 restic__docker_setup__pushover_app_token: >-
@@ -285,7 +297,7 @@ immich__docker_setup__dir_path_dict:
   upload_dir_path: "{{ immich__docker_setup__dir_path }}/upload"
   library_dir_path: "{{ backup__source_dir_path }}/immich/library"
   thumbs_dir_path: "{{ immich__docker_setup__dir_path }}/thumbs"
-  profile_dir_path: "{{ immich__docker_setup__dir_path }}/profile"
+  profile_dir_path: "{{ backup__source_dir_path }}/profile"
   encoded_video_dir_path: "{{ immich__docker_setup__dir_path }}/encoded-video"
   postgres_backup_dir_path: "{{ backup__source_dir_path }}/immich/pg-backup"
 immich__docker_setup__config_file_path: "{{ immich__docker_setup__dir_path }}/immich.config"
