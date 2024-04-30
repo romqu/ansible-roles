@@ -1,8 +1,9 @@
 ---
-- name: Make sure dir exists - {{ immich__docker_setup__dir_path }}
+- name: Make sure dirs exists
   ansible.builtin.file:
-    path: "{{ immich__docker_setup__dir_path }}"
+    path: "{{ item.value }}"
     state: directory
+  loop: "{{ immich__docker_setup__dir_path_dict | dict2items }}"
 
 - name: Copy templates
   ansible.builtin.template:
@@ -15,7 +16,6 @@
     file_name: "{{ item | basename | regex_replace('\\.j2$', '') }}"
 
 - name: Start immich compose
-
   become: true
   community.docker.docker_compose_v2:
     project_src: "{{ immich__docker_setup__dir_path }}"

@@ -34,13 +34,16 @@ services:
     labels:
       - docker-volume-backup.stop-during-backup=true
 
+  # default: daily
   backup:
     container_name: caddy-data-backup
-    image: offen/docker-volume-backup:v2.38.1
+    image: offen/docker-volume-backup:v2.39.1
     restart: always
     environment:
       BACKUP_FILENAME: backup-caddy-data-%Y-%m-%dT%H-%M-%S.tar.gz
       BACKUP_LATEST_SYMLINK: backup-latest.tar.gz
+      BACKUP_PRUNING_PREFIX: backup-
+      BACKUP_RETENTION_DAYS: 7
     volumes:
       - caddy_data:/backup/my-app-backup:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro

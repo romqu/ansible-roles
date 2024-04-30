@@ -6,19 +6,19 @@
   vars:
   #ansible_python_interpreter: "/Users/roman/projects/personal/ansible-server-config/venv/bin/python"
   tasks:
-    - name: All sudo without pw
-      become: true
-      community.general.sudoers:
-        name: all-sudo
-        user: roman
-        commands: ALL
-        nopassword: true
+    # - name: All sudo without pw
+    #   become: true
+    #   community.general.sudoers:
+    #     name: all-sudo
+    #     user: roman
+    #     commands: ALL
+    #     nopassword: true
 
-    - name: Install foot-terminfo
-      become: true
-      ansible.builtin.apt:
-        name: foot-terminfo
-        state: present
+    # - name: Install foot-terminfo
+    #   become: true
+    #   ansible.builtin.apt:
+    #     name: foot-terminfo
+    #     state: present
 
   roles:
     # - role: sshd__setup_config
@@ -45,4 +45,4 @@
     # - role: caddy/caddy__docker_setup
     # - role: immich__docker_setup
     # - role: caddy/caddy__add_site
-    - role: tailscale__docker_setup
+    # - role: tailscale__docker_setup
