@@ -58,7 +58,7 @@
     }
   },
   "logging": {
-    "enabled": false,
+    "enabled": true,
     "level": "log"
   },
   "machineLearning": {
@@ -105,7 +105,7 @@
   "storageTemplate": {
     "enabled": true,
     "hashVerificationEnabled": true,
-    "template": "{{y}}/{{MM}}/{{dd}}/{{assetId}}__{{filename}}__{{y}}_{{MM}}_{{dd}}__{{album}}"
+    "template": "{{y}}/{{MM}}/{{dd}}/{{y}}_{{MM}}_{{dd}}__{{album}}__{{filename}}__{{assetId}}"
   },
 {% endraw %}
   "thumbnail": {
