@@ -1,7 +1,0 @@
----
-- name: Converge
-  hosts: all
-  tasks:
-    - name: "Include reset_debian_vm"
-      include_role:
-        name: "reset_debian_vm"

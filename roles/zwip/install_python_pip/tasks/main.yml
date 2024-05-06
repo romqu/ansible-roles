@@ -1,6 +1,0 @@
-- name: install
-  become: true
-  apt:
-    name: python3-pip
-    state: present
-    update_cache: yes

@@ -1,7 +1,0 @@
----
-- name: update password for user "{{ username }}"
-  become: true
-  user:
-    name: "{{ username }}"
-    update_password: always
-    password: "{{ user_password | string | password_hash('sha512', user_password_salt) }}"

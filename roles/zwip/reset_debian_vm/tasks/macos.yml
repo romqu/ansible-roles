@@ -1,4 +1,0 @@
----
-- name: delete dir {{ debian_vm_tmp_dir_path }}
-  file:
-    path: "{{ debian_vm_tmp_dir_path }}"

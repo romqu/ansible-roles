@@ -1,0 +1,25 @@
+---
+- name: Reboot
+  become: true
+  ansible.builtin.command: reboot
+
+- name: Reset known hosts for {{ system__reboot_encrypted__hostname }}
+  command: ssh-keygen -R {{ system__reboot_encrypted__hostname }}
+
+- name: Wait for startup
+  ansible.builtin.include_tasks: "../roles/shared_tasks/tasks/wait_for_initramfs_ssh.yml"
+  vars:
+        shared_tasks__wait_for_ssh__host: "{{ system__reboot_encrypted__ssh_dropbear_root_host }}"
+        shared_tasks__wait_for_ssh__delay: 5
+        shared_tasks__wait_for_ssh__retries: 10
+
+- name: Unlock encrypted volume
+  ansible.builtin.include_tasks: "../roles/shared_tasks/tasks/unlock_encrypted_volume.yml"
+  vars:
+    unlock_encrypted_volume__ssh_password: "{{ system__reboot_encrypted__ssh_dropbear_root_password }}"
+    unlock_encrypted_volume__ssh_host: "{{ system__reboot_encrypted__ssh_dropbear_root_host }}"
+    unlock_encrypted_volume__crypt_password: "{{ system__reboot_encrypted__crypt_password }}"
+
+- name: Reset known hosts for {{ system__reboot_encrypted__hostname }}
+  ansible.builtin.command: ssh-keygen -R {{ system__reboot_encrypted__hostname }}
+

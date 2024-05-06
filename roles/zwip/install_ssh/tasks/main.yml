@@ -1,9 +1,0 @@
----
-- name: install
-  become: true
-  apt:
-    name: openssh-server
-    update-cache: yes
-    state: present
-  notify:
-    - enable-ssh

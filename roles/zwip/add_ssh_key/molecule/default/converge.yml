@@ -1,9 +1,0 @@
----
-- name: Converge
-  hosts: all
-  tasks:
-    - name: "Include add-ssh-key"
-      include_role:
-        name: "add_ssh_key"
-      vars:
-        - ssh_key_path: "~/.ssh/mac_id_ed25519.pub"

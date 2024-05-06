@@ -1,8 +1,0 @@
----
-- name: clone mini ci github repository
-  become: yes
-  ansible.builtin.git:
-    repo: git@github.com:romqu/mini-ci.git
-    dest: /opt/mini-ci
-    clone: yes
-    update: yes
