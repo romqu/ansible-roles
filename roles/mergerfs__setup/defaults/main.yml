@@ -1,0 +1,31 @@
+---
+mergerfs_prerequisites:
+  - fuse
+mergerfs_dist: "{{ ansible_distribution | lower }}-{{ ansible_distribution_release }}"
+mergerfs_arch_map:
+  x86_64: amd64
+mergerfs_arch: "{{ mergerfs_arch_map[ansible_userspace_architecture | default(ansible_architecture)] }}"
+mergerfs_pkg_prefix: "mergerfs_"
+mergerfs_pkg_suffix: ".{{ mergerfs_dist }}_{{ mergerfs_arch }}.deb"
+
+
+
+# Version to install: "latest" version or a specific version number, e.g. "2.28.2"
+# This setting only applies in "github_releases" mode
+mergerfs_version: latest
+
+# Mergerfs mountpoints to create. For example:
+# mergerfs_mounts:
+#   - path: /mnt/storage
+#     branches:
+#       - /mnt/data*
+#       - /mnt/other
+#     options: allow_other,use_ino
+# cache.files=off,dropcacheonclose=true,category.create=mfs
+mergerfs_mounts: []
+
+# Url of the mergerfs GitHub releases page
+mergerfs_github_releases_url: https://github.com/trapexit/mergerfs/releases
+
+# Whether the role should install prerequisites for you.
+mergerfs_install_prerequisites: true

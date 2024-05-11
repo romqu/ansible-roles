@@ -1,0 +1,49 @@
+- name: Install mergerfs prerequisites
+  become: true
+  ansible.builtin.apt:
+    name: "{{ mergerfs_prerequisites }}"
+    state: present
+
+- name: Get/parse release info
+  become: false
+  delegate_to: localhost
+  run_once: true
+  block:
+    - name: Get latest release information from GitHub
+      ansible.builtin.uri:
+        url: "{{ mergerfs_github_releases_url }}/latest"
+      register: mergerfs_github_release_page
+      check_mode: false
+
+    - name: Set latest mergerfs version fact
+      ansible.builtin.set_fact:
+        mergerfs_version: "{{ mergerfs_github_release_page['url'].split('/')[-1] }}"
+      when: mergerfs_version == "latest"
+
+    - name: Determine package download url
+      ansible.builtin.set_fact:
+        mergerfs_package_url: "{{ mergerfs_github_releases_url }}/download/{{ mergerfs_version }}/\
+          {{ mergerfs_pkg_prefix }}{{ mergerfs_version }}{{ mergerfs_pkg_suffix }}"
+
+- name: Install xz-utils package for .deb package installation
+  become: true
+  ansible.builtin.apt:
+    name: xz-utils
+    state: present
+    update_cache: true
+
+- name: Install mergerfs package with apt
+  become: true
+  ansible.builtin.apt:
+    deb: "{{ mergerfs_package_url }}"
+    state: present
+
+- name: Mount mergerfs filesystems
+  ansible.posix.mount:
+    fstype: fuse.mergerfs
+    src: "{{ ':'.join(item.branches | mandatory) }}"
+    path: "{{ item.path | mandatory }}"
+    opts: "{{ item.options | default('defaults') }}"
+    state: "{{ item.state | default('mounted') }}"
+  loop: "{{ mergerfs_mounts }}"
+  become: true
