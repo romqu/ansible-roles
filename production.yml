@@ -1,0 +1,8 @@
+# group
+prod:
+  hosts:
+    localhost_prod:
+      ansible_connection: local
+      ansible_python_interpreter: "/home/roman/projects/personal/ansible-roles/.venv/bin/python"
+    server:
+      host_uuid: "dcdbb7d7-3153-4bf2-873e-feacfed62104"
