@@ -21,3 +21,5 @@ prod__ip: "192.168.88.88"
 prod__gateway_ip: "192.168.88.1"
 prod__subnet_mask: "255.255.255.0"
 prod__net: "192.168.88.88"
+
+prod__domain: "schaunis.at"
