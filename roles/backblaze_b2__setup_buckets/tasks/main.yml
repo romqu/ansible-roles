@@ -28,14 +28,14 @@
 - name: Authorize b2 accounts
   ansible.builtin.command: >-
     {{ internal__b2_path }}
-    authorize-account {{ item.master_key_id }} {{ item.master_key }}
+    account authorize {{ item.master_key_id }} {{ item.master_key }}
     --profile {{ item.profile_name }}
   loop: "{{ backblaze_b2__setup_buckets__account_dict_list }}"
   changed_when: true
 
 - name: Register all bucket names for profile '{{ backblaze_b2__setup_buckets__account_dict_list[0].profile_name }}'
   ansible.builtin.shell: >-
-    {{ internal__b2_path }} list-buckets --profile {{ profile_name }} |
+    {{ internal__b2_path }} bucket list --profile {{ profile_name }} |
     awk '{print $3}'
   register: backblaze_b2__setup_buckets__bucket_names_result
   vars:
@@ -56,7 +56,7 @@
   block:
     - name: Create buckets
       ansible.builtin.command: >-
-        {{ internal__b2_path }} create-bucket --profile {{ item.profile_name }}
+        {{ internal__b2_path }} bucket create --profile {{ item.profile_name }}
         {{ item.bucket_name }}
         allPrivate
       loop: "{{ backblaze_b2__setup_buckets__account_dict_list }}"
@@ -65,7 +65,7 @@
 
     - name: Create keys for buckets
       ansible.builtin.command: >-
-        {{ internal__b2_path }} create-key
+        {{ internal__b2_path }} key create
         --profile {{ item.profile_name }}
         --bucket {{ item.bucket_name }}
         {{ item.bucket_name }}{{ backblaze_b2__setup_buckets__bucket_key_suffix }}
@@ -109,7 +109,7 @@
 
     - name: Create destination replication rule(s)
       ansible.builtin.shell: >-
-        {{ internal__b2_path }} update-bucket --profile {{ item.profile_name }}
+        {{ internal__b2_path }} bucket  update --profile {{ item.profile_name }}
         --replication '{{ replication_body }}' {{ item.bucket_name }}
       loop: "{{ backblaze_b2__setup_buckets__account_dict_list[1:] }}"
       loop_control:
@@ -129,7 +129,7 @@
 
     - name: Create source replication rule(s)
       ansible.builtin.shell: >-
-        {{ internal__b2_path }} update-bucket
+        {{ internal__b2_path }} bucket update
         --profile {{ source.profile_name }}
         --replication '{{ replication_body }}' {{ source.bucket_name }}
       loop: "{{ backblaze_b2__setup_buckets__account_dict_list[1:] }}"
@@ -158,7 +158,7 @@
     - name: Delete b2 buckets
       ansible.builtin.command: >-
         {{ internal__b2_path }}
-        delete-bucket {{ item.bucket_name }}
+        bucket delete {{ item.bucket_name }}
         --profile {{ item.profile_name }}
       loop: "{{ backblaze_b2__setup_buckets__account_dict_list }}"
       changed_when: true
@@ -181,7 +181,7 @@
 
 - name: Clear accounts
   ansible.builtin.command: >-
-    {{ internal__b2_path }} clear-account 
+    {{ internal__b2_path }} account clear
     --profile {{ item.profile_name }}
   loop: "{{ backblaze_b2__setup_buckets__account_dict_list }}"
 

@@ -16,12 +16,12 @@ iso__create_debian_preseed__preseed_hostname: server
 iso__create_debian_preseed__preseed_domain: server
 iso__create_debian_preseed__preseed_mirror_hostname: httpredir.debian.org
 iso__create_debian_preseed__preseed_mirror_directory: /debian
-iso__create_debian_preseed__preseed_root_password_crypted: 
+iso__create_debian_preseed__preseed_root_password_crypted:
   "$6$4w8ZAlrJrWsp0O2f$dErMswsp2.t0A9IswWyr5KpeiMbM2Az4pWsE7R.rGZebqZWOD85waKdMXiqqN8QCGFJvaWWlPnhBQV9sTcZE81"
 iso__create_debian_preseed__preseed_username_full: roman
 iso__create_debian_preseed__preseed_username: roman
 iso__create_debian_preseed__preseed_user_password: "a"
-iso__create_debian_preseed__preseed_user_password_crypted: 
+iso__create_debian_preseed__preseed_user_password_crypted:
   "$6$4w8ZAlrJrWsp0O2f$dErMswsp2.t0A9IswWyr5KpeiMbM2Az4pWsE7R.rGZebqZWOD85waKdMXiqqN8QCGFJvaWWlPnhBQV9sTcZE81"
 iso__create_debian_preseed__preseed_time_zone: Europe/Berlin
 iso__create_debian_preseed__preseed_dropbear_ssh_port: 22
@@ -33,7 +33,11 @@ iso__create_debian_preseed__preseed_server_name: "server"
 iso__create_debian_preseed__ssh_pub_key_file_path: ""
 iso__create_debian_preseed__architecture: "amd" # arm or amd
 iso__create_debian_preseed__kernel_version: 5.10.14
-iso__create_debian_preseed__url: "https://cdimage.debian.org/debian-cd/current/{{ debian_architecture }}/iso-cd/debian-{{ debian_version }}-{{ debian_architecture }}-netinst.iso"
+iso__create_debian_preseed__url: >-
+  https://cdimage.debian.org/debian-cd/current/
+  {{- iso__create_debian_preseed__debian_architecture }}/iso-cd/debian-
+  {{- iso__create_debian_preseed__debian_version }}-
+  {{- iso__create_debian_preseed__debian_architecture }}-netinst.iso
 iso__create_debian_preseed__preseed_container_name: "debian_preseed"
 iso__create_debian_preseed__sudo_without_password: false
 iso__create_debian_preseed__encrypt_boot_drive: false

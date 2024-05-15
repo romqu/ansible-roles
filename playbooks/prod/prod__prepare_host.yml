@@ -1,0 +1,18 @@
+---
+# ansible-playbook -i staging.yml --ask-become-pass playbooks/test_vm__setup.yml
+- name: Prepare prod
+  hosts: localhost_prod
+  connection: local
+  environment:
+    # PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+  vars:
+    # ansible_python_interpreter: "/home/roman/projects/personal/ansible-roles/.venv/bin/python"
+
+  roles:
+    - role: bitwarden/bitwarden__create_folder
+    - role: bitwarden/bitwarden__generate_password
+    - role: bitwarden/bitwarden__create_item
+    - role: ssh/ssh__create_keypair
+    - role: ssh/ssh__create_config
+    - role: docker__install
+    - role: iso__create_debian_preseed
