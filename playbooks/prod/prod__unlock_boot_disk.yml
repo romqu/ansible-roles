@@ -1,0 +1,10 @@
+---
+- name: Unlock boot disk
+  hosts: localhost_prod
+  connection: local
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+
+  roles:
+    - role: bitwarden/bitwarden__get_field
+    - role: system/system__unlock_encrypted

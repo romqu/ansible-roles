@@ -9,7 +9,7 @@ bitwarden__generate_password__length: 16
 
 bitwarden__create_item__data_dict_list:
   - type: "login"
-    name: "server_{{ prod__hostname }}"
+    name: "{{ prod__bitwarden_item_name }}"
     username: "{{ prod__username }}"
     password: "{{ bitwarden__generate_password__result }}"
     folder_id: "{{ bitwarden__create_folder__result_folder_id }}"
@@ -37,12 +37,13 @@ ssh__create_config__host_root: "{{ prod__ssh_dropbear_root_host }}"
 
 iso__create_debian_preseed__preseed_hostname: "{{ prod__hostname }}"
 iso__create_debian_preseed__preseed_domain: "{{ prod__hostname }}"
+iso__create_debian_preseed__preseed_server_name: "{{ prod__hostname }}"
 iso__create_debian_preseed__iso_name: "{{ prod__debian_preseed_iso_name }}"
 iso__create_debian_preseed__scripts_dir_path: "{{ prod__tmp_scripts_dir_path }}"
 iso__create_debian_preseed__iso_dir_path: "{{prod__tmp_iso_dir_path }}"
 iso__create_debian_preseed__debian_architecture: "{{ prod__debian_architecture }}"
 iso__create_debian_preseed__debian_version: "{{ prod__debian_version }}"
-iso__create_debian_preseed__sudo_without_password: true
+iso__create_debian_preseed__sudo_without_password: false
 iso__create_debian_preseed__preseed_username: "{{ prod__username }}"
 iso__create_debian_preseed__preseed_username_full: "{{ prod__username }}"
 iso__create_debian_preseed__preseed_user_password: "{{ bitwarden__generate_password__result }}"
@@ -56,3 +57,15 @@ iso__create_debian_preseed__encrypt_password: "{{ bitwarden__generate_password__
 iso__create_debian_preseed__ssh_pub_key_file_path: "{{ ssh__create_keypair__pub_file_path }}"
 
 ############################################################################################################
+
+bitwarden_get_field__data_dict_list:
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__server_password"
+    bitwarden__get_field__entry_name: "{{ prod__bitwarden_item_name }}"
+    bitwarden__get_field__field_name: "password"
+
+############################################################################
+
+system__unlock_encrypted__hostname: "{{ prod__hostname }}"
+system__unlock_encrypted__crypt_password: "{{ bitwarden__get_field__server_password }}"
+system__unlock_encrypted__ssh_dropbear_root_host: "{{ prod__ssh_dropbear_root_host }}"
+system__unlock_encrypted__ssh_dropbear_root_password: "{{ bitwarden__get_field__server_password }}"

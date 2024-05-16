@@ -1,6 +1,8 @@
 prod__hostname: "augustus"
 prod__username: "roman"
 
+prod__bitwarden_item_name: "server_{{ prod__hostname }}"
+
 prod__ssh_host: "augustus"
 prod__ssh_port: "22"
 prod__ssh_dropbear_root_host: "{{ prod__ssh_host }}_root"
