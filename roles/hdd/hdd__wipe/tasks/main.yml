@@ -1,7 +1,9 @@
 ---
 - name: Wipe {{ hdd__wipe__disk_paths }}
   become: true
-  when: hdd__wipe__disk_paths | length > 0
+  when: 
+    - hdd__wipe__disk_paths is defined
+    - hdd__wipe__disk_paths | length > 0
   register: hdd__wipe__disk_paths_result
   ansible.builtin.command: dd if=/dev/zero of={{ item }} bs=4096
   loop: "{{ hdd__wipe__disk_paths }}"

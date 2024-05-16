@@ -1,30 +1,35 @@
 ---
 - name: Convert
-  ansible.builtin.set_fact:
-    backup__create_dirs__convert_from_zfs_dataset_output: >-
-      {{
-        backup__create_dirs__convert_from_zfs_dataset_output |
-        default([]) + append
-      }}
-  loop: "{{ backup__create_dirs__convert_from_zfs_dataset_input }}"
-  vars:
-    append:
-      - root_dir_path: >-
-          {{ item.pool_mount_path }}/{{ item.dataset_name }}
-        backup_dir_name: "backup"
-        backup_dir_path: >-
-          {{ item.pool_mount_path }}/{{ item.dataset_name }}/backup
-        backup_dir_owner: "{{ shared__test_vm__username }}"
+  block:
+    - name: Convert
+      ansible.builtin.set_fact:
+        backup__create_dirs__convert_from_zfs_dataset_output: >-
+          {{
+            backup__create_dirs__convert_from_zfs_dataset_output |
+            default([]) + append
+          }}
+      loop: "{{ backup__create_dirs__convert_from_zfs_dataset_input }}"
+      vars:
+        append:
+          - root_dir_path: >-
+              {{ item.pool_mount_path }}/{{ item.dataset_name }}
+            backup_dir_name: "backup"
+            backup_dir_path: >-
+              {{ item.pool_mount_path }}/{{ item.dataset_name }}/backup
+            backup_dir_owner: "{{ shared__test_vm__username }}"
 
-- name: print
-  debug:
-    var: backup__create_dirs__convert_from_zfs_dataset_output
+    - name: print
+      debug:
+        var: backup__create_dirs__convert_from_zfs_dataset_output
 
-- name: Append
-  ansible.builtin.set_fact:
-    backup__create_dirs__input: >-
-      {{
-        backup__create_dirs__input |
-        default([]) +
-        backup__create_dirs__convert_from_zfs_dataset_output
-      }}
+    - name: Append
+      ansible.builtin.set_fact:
+        backup__create_dirs__input: >-
+          {{
+            backup__create_dirs__input |
+            default([]) +
+            backup__create_dirs__convert_from_zfs_dataset_output
+          }}
+  when: 
+    - backup__create_dirs__convert_from_zfs_dataset_input is defined
+    - backup__create_dirs__convert_from_zfs_dataset_input | length > 0

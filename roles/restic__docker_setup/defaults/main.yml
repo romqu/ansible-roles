@@ -1,5 +1,5 @@
 restic__docker_setup__dir_path: "{{ ansible_env.HOME }}/docker/restic"
-restic__docker_setup__compose_file_path: 
+restic__docker_setup__compose_file_path:
   "{{ restic__docker_setup__dir_path }}/compose.yml"
 restic__docker_setup__user_id: "{{ ansible_facts.user_uid }}"
 restic__docker_setup__group_id: "{{ ansible_facts.user_gid }}"
@@ -23,10 +23,9 @@ restic__docker_setup__group_id: "{{ ansible_facts.user_gid }}"
 #    }
 #  ]
 restic__docker_setup__repo_dict: >-
-  {{ restic__docker_setup__repo_local_dict
-      | zip(restic__docker_setup__repo_remote_dict)
-      | flatten
-      | unique
+  {{
+    (restic__docker_setup__repo_local_dict | default([])) +
+    (restic__docker_setup__repo_remote_dict | default([]))
   }}
 # restic__docker_setup__pushover_user_key:
 # restic__docker_setup__pushover_app_token:

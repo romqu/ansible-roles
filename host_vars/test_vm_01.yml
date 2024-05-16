@@ -33,7 +33,7 @@ luks__open__keyfile_path: "{{ luks__encrypt__keyfile_file_path }}"
 ############################################################################
 
 hdd__zfs_mirror_list: "{{ luks__open__disk_data_list_result[:2] }}"
-hdd__ext4_list: "{{ luks__open__disk_data_list_result[2:] }}"
+hdd__ext4_list: "{{ luks__open__disk_data_list_result[2:] | default([]) }}"
 
 ############################################################################
 

@@ -1,23 +1,25 @@
 ---
-- name: Ensure dir exists
-  become: true
-  ansible.builtin.file:
-    path: "{{ luks__encrypt__keyfile_dir_path }}"
-    state: directory
-
-- name: Create passphrase keyfile
-  become: true
-  ansible.builtin.copy:
-    dest: "{{ luks__encrypt__keyfile_file_path }}"
-    content: "{{ luks__encrypt__passphrase }}"
-    owner: root
-    group: root
-    mode: "0400"
-
 - name: Run when at least one drive found
-  when: luks__encrypt__disk_path_list | length > 0
+  when:
+    - luks__encrypt__disk_path_list is defined
+    - luks__encrypt__disk_path_list | length > 0
   become: true
   block:
+    - name: Ensure dir exists
+      become: true
+      ansible.builtin.file:
+        path: "{{ luks__encrypt__keyfile_dir_path }}"
+        state: directory
+
+    - name: Create passphrase keyfile
+      become: true
+      ansible.builtin.copy:
+        dest: "{{ luks__encrypt__keyfile_file_path }}"
+        content: "{{ luks__encrypt__passphrase }}"
+        owner: root
+        group: root
+        mode: "0400"
+        
     - name: Install cryptsetup
       ansible.builtin.apt:
         name: cryptsetup
