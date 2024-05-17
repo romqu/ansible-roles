@@ -1,3 +1,4 @@
+restic__docker_setup__hostname: "{{ inventory_hostname }}"
 restic__docker_setup__dir_path: "{{ ansible_env.HOME }}/docker/restic"
 restic__docker_setup__compose_file_path:
   "{{ restic__docker_setup__dir_path }}/compose.yml"

@@ -1,8 +1,8 @@
 # sudo docker compose exec restic ash
 services:
   restic:
-    hostname: server
-    container_name: restic-server
+    hostname: "{{ restic__docker_setup__hostname }}"
+    container_name: restic
     build:
       context: .
       args:

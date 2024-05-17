@@ -5,4 +5,4 @@ prod:
       ansible_connection: local
       ansible_python_interpreter: "/home/roman/projects/personal/ansible-roles/.venv/bin/python"
     augustus:
-      host_uuid: "dcdbb7d7-3153-4bf2-873e-feacfed62104"
+      host_uuid: "92153188-01ad-4431-addb-421fe0f64bb3 "

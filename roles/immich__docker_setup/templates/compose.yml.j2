@@ -5,11 +5,8 @@
 #
 # The compose file on main may not be compatible with the latest release.
 #
-# docker compose down --volumes
-# docker compose up -d
  
 name: immich
-
 services:
   immich-server:
     container_name: {{ immich__docker_setup__server_container_name }}
