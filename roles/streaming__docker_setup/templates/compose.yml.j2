@@ -45,6 +45,21 @@ services:
       - /home/roman/docker/sonarr/config:/config
       - /home/roman/docker/shared/streaming:/shared
 
+  radarr:
+    image: ghcr.io/hotio/radarr:latest
+    container_name: radarr
+    ports:
+      - "7878:7878"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+      - TZ=Etc/UTC
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/roman/docker/radarr/config:/config
+      - /home/roman/docker/shared/streaming:/shared
+
   jellyseerr:
     image: ghcr.io/hotio/jellyseerr:latest
     container_name: jellyseerr
@@ -75,7 +90,7 @@ services:
       - PGID=1000
       - UMASK=002
       - TZ=Etc/UTC
-#      - JELLYFIN_PublishedServerUrl=192.168.88.82
+      - JELLYFIN_PublishedServerUrl=192.168.88.88
     volumes:
       - /home/roman/docker/jellyfin/config:/config
       - /home/roman/docker/jellyfin/cache:/cache
@@ -88,4 +103,4 @@ services:
 
 
 
-# mkdir -p /home/roman/docker/shared/usenet/{incomplete,complete/{movies,tv}} /home/roman/docker/shared/media/{movies,tv}
+# mkdir -p /home/roman/docker/shared/streaming/{incomplete,complete/{movies,tv}} /home/roman/docker/shared/streaming/media/{movies,tv}

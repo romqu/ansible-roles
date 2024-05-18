@@ -16,11 +16,7 @@
             backup_dir_name: "backup"
             backup_dir_path: >-
               {{ item.pool_mount_path }}/{{ item.dataset_name }}/backup
-            backup_dir_owner: "{{ shared__test_vm__username }}"
-
-    - name: print
-      debug:
-        var: backup__create_dirs__convert_from_zfs_dataset_output
+            backup_dir_owner: "{{ item.backup_dir_owner }}"
 
     - name: Append
       ansible.builtin.set_fact:

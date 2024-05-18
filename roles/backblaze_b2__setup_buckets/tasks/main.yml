@@ -163,6 +163,10 @@
       loop: "{{ backblaze_b2__setup_buckets__account_dict_list }}"
       changed_when: true
 
+    - name: Fail
+      ansible.builtin.fail:
+        msg: "{{ansible_failed_result}}"
+
 
 - name: Set result
   ansible.builtin.set_fact:
