@@ -27,7 +27,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /home/roman/docker/sabnzbd/config:/config
-      - /home/roman/docker/shared/streaming/usenet:/shared/usenet
+      - /home/roman/docker/shared/mediaserver/usenet:/mediaserver/usenet
     restart: unless-stopped
 
   sonarr:
@@ -43,7 +43,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /home/roman/docker/sonarr/config:/config
-      - /home/roman/docker/shared/streaming:/shared
+      - /home/roman/docker/shared/mediaserver:/mediaserver
+    restart: unless-stopped
 
   radarr:
     image: ghcr.io/hotio/radarr:latest
@@ -58,7 +59,22 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /home/roman/docker/radarr/config:/config
-      - /home/roman/docker/shared/streaming:/shared
+      - /home/roman/docker/shared/mediaserver:/mediaserver
+    restart: unless-stopped
+
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr
+    container_name: recyclarr
+    user: 1000:1000
+    read_only: true
+    tmpfs: /tmp
+    volumes:
+      - /home/roman/docker/recyclarr/config:/config
+    environment:
+      - TZ=Etc/UTC
+      - RECYCLARR_CREATE_CONFIG=true
+      - CRON_SCHEDULE=@daily
+    restart: unless-stopped
 
   jellyseerr:
     image: ghcr.io/hotio/jellyseerr:latest
@@ -73,6 +89,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /home/roman/docker/jellyseerr/config:/config
+    restart: unless-stopped
 
   jellyfin:
     image: jellyfin/jellyfin
@@ -94,13 +111,13 @@ services:
     volumes:
       - /home/roman/docker/jellyfin/config:/config
       - /home/roman/docker/jellyfin/cache:/cache
-      - /home/roman/docker/shared/streaming/media/movies:/shared/media/movies
-      - /home/roman/docker/shared/streaming/media/tv:/shared/media/tv
+      - /home/roman/docker/shared/mediaserver/media/movies:/mediaserver/media/movies
+      - /home/roman/docker/shared/mediaserver/media/tv:/mediaserver/media/tv
         # Optional - may be necessary for docker healthcheck to pass if running in host network mode
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    restart: 'unless-stopped'
+    restart: unless-stopped
 
 
 
-# mkdir -p /home/roman/docker/shared/streaming/{incomplete,complete/{movies,tv}} /home/roman/docker/shared/streaming/media/{movies,tv}
+# mkdir -p /home/roman/docker/shared/mediaserver/usenet/{incomplete,complete/{movies,tv}} /home/roman/docker/shared/mediaserver/media/{movies,tv}
