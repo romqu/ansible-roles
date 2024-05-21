@@ -1,5 +1,5 @@
 radarr:
-  movies:
+  radarr_main:
     base_url: http://radarr:7878
     api_key: 574549606f3f4c2fb68c501876ba0894
 
@@ -9,6 +9,37 @@ radarr:
     delete_old_custom_formats: true
     replace_existing_custom_formats: true
 
+    quality_profiles:
+      - name: Best Possible
+        reset_unmatched_scores:
+          enabled: true
+        upgrade:
+          allowed: true
+          until_score: 100000
+          until_quality: Remux-2160p
+        min_format_score: 0
+        quality_sort: top
+        qualities:
+          - name: Remux-2160p
+          - name: Bluray-2160p
+          - name: WEB 2160p
+            qualities:
+              - WEBDL-2160p
+              - WEBRip-2160p
+          - name: HDTV-2160p
+          - name: Remux-1080p
+          - name: Bluray-1080p
+          - name: WEB 1080p
+            qualities:
+              - WEBDL-1080p
+              - WEBRip-1080p
+          - name: HDTV-1080p
+          - name: Bluray-720p
+          - name: WEB 720p
+            qualities:
+              - WEBDL-720p
+              - WEBRip-720p
+          - name: HDTV-720p
     custom_formats:
       - trash_ids:
             # Audio
@@ -61,7 +92,10 @@ radarr:
             - bfd8eb01832d646a0a89c4deb46f8564 # Upscaled
             - 0a3f082873eb454bde444150b70253cc # Extras
             # Optional          
-            - 90cedc1fea7ea5d11298bebd3d1d3223 # EVO (no WEBDL) 
+            - b6832f586342ef70d9c128d40c07b872 # Bad Dual Groups
+            - 90cedc1fea7ea5d11298bebd3d1d3223 # EVO (no WEBDL)
+            - ae9b7c9ebde1f3bd336a8cbd1ec4c5e5 # No-RlsGroup
+            - 5c44f52a8714fdd79bb4d98e2673be1f # Retags
             - 839bea857ed2c0a8e084f3cbdbd65ecb # x265 (no HDR/DV)
             # Optional UHD
             - 25c12f78430a3a23413652cbd1d48d77 # SDR (no WEBDL)
@@ -93,3 +127,109 @@ radarr:
             - c20f169ef63c5f40c2def54abaf4438e # WEB Tier 01
             - 403816d65392c79236dcb6dd591aeda4 # WEB Tier 02
             - af94e0fe497124d1f9ce732069ec8c3b # WEB Tier 03
+        quality_profiles:
+          - name: Best Possible
+sonarr:
+  sonarr_main:
+    base_url: http://sonarr:8989
+    api_key: ece49e50a81b4bf4a1b059d9a963db82
+
+    quality_definition:
+      type: series
+
+    delete_old_custom_formats: true
+    replace_existing_custom_formats: true
+
+    quality_profiles:
+      - name: Best Possible
+        reset_unmatched_scores:
+          enabled: true
+        upgrade:
+          allowed: true
+          until_score: 100000
+          until_quality: Bluray-2160p Remux
+        min_format_score: 0
+        quality_sort: top
+        qualities:
+          - name: Bluray-2160p Remux
+          - name: Bluray-2160p
+          - name: WEB 2160p
+            qualities:
+              - WEBDL-2160p
+              - WEBRip-2160p
+          - name: HDTV-2160p
+          - name: Bluray-1080p Remux
+          - name: Bluray-1080p
+          - name: WEB 1080p
+            qualities:
+              - WEBDL-1080p
+              - WEBRip-1080p
+          - name: HDTV-1080p
+          - name: Bluray-720p
+          - name: WEB 720p
+            qualities:
+              - WEBDL-720p
+              - WEBRip-720p
+          - name: HDTV-720p
+          - name: Bluray-480p
+          - name: DVD
+          - name: WEB 480p
+            qualities:
+              - WEBDL-480p
+              - WEBRip-480p
+          - name: SDTV
+    custom_formats:
+      - trash_ids:
+            # HDR Formats
+            - 2b239ed870daba8126a53bd5dc8dc1c8 # DV HDR10+
+            - 7878c33f1963fefb3d6c8657d46c2f0a # DV HDR10
+            - 6d0d8de7b57e35518ac0308b0ddf404e # DV
+            - 1f733af03141f068a540eec352589a89 # DV HLG
+            - 27954b0a80aab882522a88a4d9eae1cd # DV SDR
+            - a3d82cbef5039f8d295478d28a887159 # HDR10+
+            - 3497799d29a085e2ac2df9d468413c94 # HDR10
+            - 3e2c4e748b64a1a1118e0ea3f4cf6875 # HDR
+            - bb019e1cd00f304f80971c965de064dc # HDR (undefined)
+            - 2a7e3be05d3861d6df7171ec74cad727 # PQ
+            - 17e889ce13117940092308f48b48b45b # HLG
+             # Unwanted
+            - 85c61753df5da1fb2aab6f2a47426b09 # BR-DISK
+            - 9c11cd3f07101cdba90a2d81cf0e56b4 # LQ
+            - e2315f990da2e2cbfc9fa5b7a6fcfe48 # LQ (Release Title)
+            - fbcb31d8dabd2a319072b84fc0b7249c # Extras
+            # Optional          
+            - 32b367365729d530ca1c124a0b180c64 # Bad Dual Groups
+            - 82d40da2bc6923f41e14394075dd4b03 # No-RlsGroup
+            - 06d66ab109d4d2eddb2794d21526d140 # Retags
+            - 9b64dff695c2115facf1b6ea59c9bd07 # x265 (no HDR/DV)
+            # Optional UHD
+            - 83304f261cf516bb208c18c54c0adf97 # SDR (no WEBDL)
+            # Misc
+            - ec8fa7296b64e8cd390a1600981f3923 # Repack/Proper
+            - eb3d5cc0a2be0db205fb823640db6a3c # Repack2
+            - 44e7c4de10ae50265753082e5dc76047 # Repack3
+            # General Streaming Services
+            - d660701077794679fd59e8bdf4ce3a29 # AMZN
+            - f67c9ca88f463a48346062e8ad07713f # ATVP
+            - 77a7b25585c18af08f60b1547bb9b4fb # CC
+            - 36b72f59f4ea20aad9316f475f2d9fbb # DCU
+            - 89358767a60cc28783cdc3d0be9388a4 # DSNP
+            - a880d6abc21e7c16884f3ae393f84179 # HMAX
+            - 7a235133c87f7da4c8cccceca7e3c7a6 # HBO
+            - f6cce30f1733d5c8194222a7507909bb # Hulu
+            - 0ac24a2a68a9700bcb7eeca8e5cd644c # iT
+            - 81d1fbf600e2540cee87f3a23f9d3c1c # MAX
+            - d34870697c9db575f17700212167be23 # NF
+            - c67a75ae4a1715f2bb4d492755ba4195 # PMTP
+            - 1656adc6d7bb2c8cca6acfb6592db421 # PCOK
+            - ae58039e1319178e6be73caab5c42166 # SHO
+            - 1efe8da11bfd74fbbcd4d8117ddb9213 # STAN
+            - 43b3cf48cb385cd3eac608ee6bca7f09 # UHD Streaming Boost
+            - d2d299244a92b8a52d4921ce3897a256 # UHD Streaming Cut
+            # HQ Release Groups
+            - e6258996055b9fbab7e9cb2f75819294 # WEB Tier 01
+            - 58790d4e2fdcd9733aa7ae68ba2bb503 # WEB Tier 02
+            - d84935abd3f8556dcd51d4f27e22d0a6 # WEB Tier 03
+            - d0c516558625b04b363fa6c5c2c7cfd4 # WEB Scene
+        quality_profiles:
+          - name: Best Possible
