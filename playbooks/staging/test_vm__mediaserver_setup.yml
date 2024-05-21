@@ -1,0 +1,9 @@
+---
+- name: Setup mediaserver
+  hosts: test_vm_01
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+
+  roles:
+    - role: zfs/zfs__create_dataset
+    - role: hdd/hdd__create_filesystem
