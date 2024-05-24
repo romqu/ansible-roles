@@ -1,4 +1,4 @@
-zfs__create_dataset__data_list: null
+# zfs__create_dataset__data_list:
 #  - pool_name: "tank"
 #    dataset_name: "data"
 #    properties:

@@ -1,0 +1,77 @@
+network:
+  schema: http
+  host: evcc.local # .local suffix announces the hostname on MDNS
+  port: 7070
+interval: 10s # control cycle interval
+
+log: info
+
+meters:
+- type: template
+  template: huawei-dongle-powersensor 
+  id: 1  
+  host: 192.168.178.23  
+  port: 502  
+  usage: grid  
+  modbus: tcpip  
+  name: grid1
+- type: template
+  template: huawei-dongle-powersensor 
+  id: 1  
+  host: 192.168.178.23  
+  port: 502  
+  usage: pv  
+  modbus: tcpip  
+  name: pv2
+- name: battery1
+  type: template
+  template: huawei-dongle-powersensor
+  usage: battery     
+  modbus: tcpip
+  id: 1
+  host: 192.168.178.23
+  port: 502
+
+chargers:
+- type: template
+  template: easee 
+  user: 
+  password: 
+  charger: EH794545
+  name: wallbox4
+
+
+vehicles:
+#  - name: peugeot
+#    type: peugeot
+#    title: e-208
+#    capacity: 50
+#    user: 
+#    password: 
+#    vin: 
+  - name: tesla_y
+    type: tesla
+    title: Model Y  # display name for UI
+#    user: 
+#    password: 
+    capacity: 83  # kWh
+    tokens:
+      access:
+      refresh: 
+      vin: 
+
+loadpoints:
+  - title: Garage
+    charger: wallbox4
+    vehicle: tesla_y
+    mode: pv
+    phases: 0
+
+site:
+  title: Mein Zuhause
+  meters:
+    grid: grid1
+    pv: pv2
+    battery: battery1
+
+sponsortoken:

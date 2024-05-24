@@ -14,7 +14,6 @@ bitwarden__create_item__data_dict_list:
     password: "{{ bitwarden__generate_password__result }}"
     folder_id: "{{ bitwarden__create_folder__result_folder_id }}"
 
-
 ############################################################################################################
 
 ssh__create_keypair__passphrase: "{{ bitwarden__generate_password__result }}"

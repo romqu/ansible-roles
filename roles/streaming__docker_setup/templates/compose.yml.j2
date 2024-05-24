@@ -12,7 +12,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /home/roman/docker/sabnzbd/config:/config
-      - /home/roman/docker/shared/mediaserver/usenet:/mediaserver/usenet
+      - /home/roman/docker/sabnzbd/incomplete:/mediaserver/usenet/incomplete
+      - /mnt/zdata/zmedia/mediaserver/usenet/complete:/mediaserver/usenet/complete
     restart: unless-stopped
 
   prowlarr:
@@ -42,8 +43,8 @@ services:
       - TZ=Etc/UTC
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /home/roman/docker/sonarr/config:/config
-      - /home/roman/docker/shared/mediaserver:/mediaserver
+      - /mnt/zdata/zbackup/docker/sonarr/config:/config
+      - /mnt/zdata/zmedia/mediaserver:/mediaserver
     restart: unless-stopped
 
   radarr:
@@ -58,8 +59,8 @@ services:
       - TZ=Etc/UTC
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /home/roman/docker/radarr/config:/config
-      - /home/roman/docker/shared/mediaserver:/mediaserver
+      - /mnt/zdata/zbackup/docker/radarr/config:/config
+      - /mnt/zdata/zmedia/mediaserver:/mediaserver
     restart: unless-stopped
 
   recyclarr:
@@ -88,7 +89,7 @@ services:
       - TZ=Etc/UTC
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /home/roman/docker/jellyseerr/config:/config
+      - /mnt/zdata/zbackup/docker/jellyseerr/config:/config
     restart: unless-stopped
 
   jellyfin:
@@ -112,8 +113,8 @@ services:
     volumes:
       - /home/roman/docker/jellyfin/config:/config
       - /home/roman/docker/jellyfin/cache:/cache
-      - /home/roman/docker/shared/mediaserver/media/movies:/mediaserver/media/movies
-      - /home/roman/docker/shared/mediaserver/media/tv:/mediaserver/media/tv
+      - /mnt/zdata/zmedia/mediaserver/media/movies:/mediaserver/media/movies
+      - /mnt/zdata/zmedia/mediaserver/media/tv:/mediaserver/media/tv
         # Optional - may be necessary for docker healthcheck to pass if running in host network mode
     extra_hosts:
       - "host.docker.internal:host-gateway"

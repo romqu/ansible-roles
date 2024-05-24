@@ -1,0 +1,6 @@
+zfs__create_dataset__data_list:
+ - pool_name: "zdata"
+   dataset_name: "zmedia"
+   properties:
+    atime: "off"
+    recordsize: "1M"
