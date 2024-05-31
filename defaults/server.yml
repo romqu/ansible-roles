@@ -1,6 +1,7 @@
 username: "roman"
 
 ssh_port: "22"
+ssh_dropbear_root_host: "{{ ssh_host }}"
 
 bitwarden_item_name: "server_{{ hostname }}"
 
