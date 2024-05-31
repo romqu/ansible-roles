@@ -1,7 +1,5 @@
 username: "roman"
-hostname: "augustus"
 
-ssh_host: "augustus"
 ssh_port: "22"
 
 bitwarden_item_name: "server_{{ hostname }}"
