@@ -1,0 +1,19 @@
+username: "roman"
+hostname: "augustus"
+
+ssh_host: "augustus"
+ssh_port: "22"
+
+bitwarden_item_name: "server_{{ hostname }}"
+
+ansible_tmp_dir_path: "/tmp/ansible"
+
+debian_version: "12.5.0"
+debian_architecture: "amd64"
+debian_preseed_iso_name: "debian_{{ debian_version }}_{{ debian_architecture }}_preseed.iso"
+
+tmp_dir_path: "{{ ansible_tmp_dir_path }}/debian_vm"
+tmp_scripts_dir_path: "{{ tmp_dir_path }}/scripts"
+tmp_iso_dir_path: "{{ tmp_dir_path }}/iso"
+tmp_files_dir_path: "{{ tmp_dir_path }}/files"
+tmp_iso_file_path: "{{ tmp_iso_dir_path }}/{{ debian_preseed_iso_name }}"

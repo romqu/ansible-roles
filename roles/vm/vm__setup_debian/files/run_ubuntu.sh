@@ -183,7 +183,7 @@ qemu-system-aarch64 \
 -device ide-hd,drive=disk0,bus=ahci0.0 \
 {% for item in debian_vm_hdd_image_files.results %}
     \
-    -drive id=disk{{ loop.index }},file={{ debian_vm_tmp_files_dir_path }}/{{ item.stdout }},if=none \
+    -drive id=disk{{ loop.index }},file={{ tmp_files_dir_path }}/{{ item.stdout }},if=none \
     -device ahci,id=ahci{{ loop.index }} \
     -device ide-hd,drive=disk{{ loop.index }},bus=ahci{{ loop.index }}.0 \
 {% endfor %}

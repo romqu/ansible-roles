@@ -6,6 +6,8 @@
     # PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
   vars:
     # ansible_python_interpreter: "/home/roman/projects/personal/ansible-roles/.venv/bin/python"
+  vars_files:
+    - "{{ inventory_dir }}/defaults/server.yml"
 
   roles:
     - role: bitwarden/bitwarden__create_folder

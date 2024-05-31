@@ -21,14 +21,14 @@
     path: "{{ item }}"
     state: directory
   loop:
-    - "{{ debian_vm_tmp_scripts_dir_path }}"
-    - "{{ debian_vm_tmp_files_dir_path }}"
-    - "{{ debian_vm_tmp_iso_dir_path }}"
+    - "{{ tmp_scripts_dir_path }}"
+    - "{{ tmp_files_dir_path }}"
+    - "{{ tmp_iso_dir_path }}"
 
 - name: create '{{ debian_vm_image_file }}' image
   command: qemu-img create -f qcow2 {{ debian_vm_image_file }} {{ vm__setup_debian__image_size }}
   args:
-    chdir: "{{ debian_vm_tmp_files_dir_path }}"
+    chdir: "{{ tmp_files_dir_path }}"
 
 - name: Register vm hdds
   ansible.builtin.include_role:
@@ -38,7 +38,7 @@
 - name: create {{ debian_vm_hdd_image_quantity }} hdd image(s)
   command: qemu-img create -f qcow2 {{ item.stdout }} {{ vm__setup_debian__hdd_image_size }}
   args:
-    chdir: "{{ debian_vm_tmp_files_dir_path }}"
+    chdir: "{{ tmp_files_dir_path }}"
   loop: "{{ debian_vm_hdd_image_files.results }}"
 
 - name: install preseeded debian vm
@@ -60,7 +60,7 @@
           -nic vmnet-shared \
           -device driver=virtio-net,netdev=net0 \
           -drive if=none,file={{ debian_vm_tmp_image_file_path }},format={{ debian_vm_image_format }},id=hd0 \
-          -drive file="{{ debian_vm_tmp_iso_file_path }}",id=cdrom,if=none,media=cdrom \
+          -drive file="{{ tmp_iso_file_path }}",id=cdrom,if=none,media=cdrom \
           -device virtio-blk-device,drive=hd0 \
           -device virtio-scsi-device \
           -device scsi-cd,drive=cdrom
@@ -112,17 +112,17 @@
     - {
       image: "{{ debian_vm_tmp_image_file_path }}",
       file: "{{ vm__setup_debian__extract_img_name }}",
-      dest: "{{ debian_vm_tmp_dir_path }}",
+      dest: "{{ tmp_dir_path }}",
     }
     - {
       image: "{{ vm__setup_debian__extract_img_file_path }}",
       file: "{{ vm__setup_debian__extract_kernel_img_file }}",
-      dest: "{{ debian_vm_tmp_files_dir_path }}",
+      dest: "{{ tmp_files_dir_path }}",
     }
     - {
       image: "{{ vm__setup_debian__extract_img_file_path }}",
       file: "{{ vm__setup_debian__extract_initrd_img_file }}",
-      dest: "{{ debian_vm_tmp_files_dir_path }}",
+      dest: "{{ tmp_files_dir_path }}",
     }
 
 - name: clear {{ debian_vm_persistent_dir_path }}
@@ -134,9 +134,9 @@
     - directory
 
 - name: move files to {{ debian_vm_persistent_dir_path }}
-  shell: "mv -f {{ debian_vm_tmp_files_dir_path }}/* {{ debian_vm_persistent_dir_path }}"
+  shell: "mv -f {{ tmp_files_dir_path }}/* {{ debian_vm_persistent_dir_path }}"
 
-- name: delete {{ debian_vm_tmp_dir_path }} with content
+- name: delete {{ tmp_dir_path }} with content
   file:
-    path: "{{ debian_vm_tmp_dir_path }}"
+    path: "{{ tmp_dir_path }}"
     state: absent

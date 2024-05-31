@@ -1,6 +1,6 @@
 bitwarden__get_password__result: >-
   {{
-    lookup('community.general.bitwarden', test_vm__bitwarden__item_name, field='password') |
+    lookup('community.general.bitwarden', bitwarden_item_name, field='password') |
     first
   }}
 
@@ -10,7 +10,7 @@ ansible_become_pass: "{{ bitwarden__get_password__result }}"
 
 ############################################################################
 
-sshd__setup_config__port: "{{ test_vm__ssh_port }}"
+sshd__setup_config__port: "{{ ssh_port }}"
 
 ############################################################################
 
@@ -80,7 +80,7 @@ fstab__add_entry__data_list: >-
           'partition_filesystem': 'ext4',
           'mount_root_dir_path': '/mnt',
           'mount_root_dir_name': 'mnt',
-          'mount_dir_owner': shared__test_vm__username,
+          'mount_dir_owner': username,
           'systemd_idle_timeout_sec': 30,
         }
        )
@@ -98,7 +98,7 @@ backup__create_dirs__convert_from_zfs_dataset_input: >-
   {{ 
     zfs__create_dataset__data_list |
     map('combine', {
-      'backup_dir_owner': shared__test_vm__username,
+      'backup_dir_owner': username,
       'pool_mount_path': zfs__create_pool__mount_path
      }
     )
@@ -106,12 +106,12 @@ backup__create_dirs__convert_from_zfs_dataset_input: >-
 backup__create_dirs__convert_from_fstab_input: >-
   {{ 
     fstab__add_entry__data_list |
-    map('combine', {'backup_dir_owner': shared__test_vm__username })
+    map('combine', {'backup_dir_owner': username })
   }}
 backup__create_dirs__convert_from_ext4_partitions_input: >-
   {{ 
     hdd__get_all__ext4_partition_mount_dir_paths_result |
-    map('combine', {'backup_dir_owner': shared__test_vm__username })
+    map('combine', {'backup_dir_owner': username })
   }}
 
 backup__create_dirs__main_dir_marker_file_name: "{{ host_uuid }}"

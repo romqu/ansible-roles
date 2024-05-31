@@ -1,27 +1,6 @@
-prod__hostname: "augustus"
-prod__username: "roman"
+ip: "192.168.88.88"
+gateway_ip: "192.168.88.1"
+subnet_mask: "255.255.255.0"
+net: "192.168.88.88"
 
-prod__bitwarden_item_name: "server_{{ prod__hostname }}"
-
-prod__ssh_host: "augustus"
-prod__ssh_port: "22"
-prod__ssh_dropbear_root_host: "{{ prod__ssh_host }}_root"
-
-prod__ansible_tmp_dir_path: "/tmp/ansible"
-
-prod__debian_version: "12.5.0"
-prod__debian_architecture: "amd64"
-prod__debian_preseed_iso_name: "debian_{{ prod__debian_version }}_{{ prod__debian_architecture }}_preseed.iso"
-
-prod__tmp_dir_path: "{{ prod__ansible_tmp_dir_path }}/debian_vm"
-prod__tmp_scripts_dir_path: "{{ prod__tmp_dir_path }}/scripts"
-prod__tmp_iso_dir_path: "{{ prod__tmp_dir_path }}/iso"
-prod__tmp_files_dir_path: "{{ prod__tmp_dir_path }}/files"
-prod__tmp_iso_file_path: "{{ prod__tmp_iso_dir_path }}/{{ prod__debian_preseed_iso_name }}"
-
-prod__ip: "192.168.88.88"
-prod__gateway_ip: "192.168.88.1"
-prod__subnet_mask: "255.255.255.0"
-prod__net: "192.168.88.88"
-
-prod__domain: "schaunis.at"
+domain: "schaunis.at"
