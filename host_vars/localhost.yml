@@ -1,56 +1,7 @@
-bitwarden__create_folder__folder_name: "home"
-bitwarden__create_folder__folder_parent: "private/server"
-
-############################################################################################################
-
-bitwarden__generate_password__length: 16
-
-############################################################################################################
-
-bitwarden__create_item__data_dict_list:
-  - type: "login"
-    name: "{{ bitwarden_item_name }}"
-    username: "{{ username }}"
-    password: "{{ bitwarden__generate_password__result }}"
-    folder_id: "{{ bitwarden__create_folder__result_folder_id }}"
-
-############################################################################################################
-
-ssh__create_keypair__passphrase: "{{ bitwarden__generate_password__result }}"
-ssh__create_keypair__type: "ed25519"
-ssh__create_keypair__name: "test_vm_01_key"
-ssh__create_keypair__dir_path: "~/.ssh/ansible_keys"
-
-############################################################################################################
-
-ssh__create_config__file_name: "{{ ssh__create_keypair__name }}_config"
-ssh__create_config__identity_file_path: "{{ ssh__create_keypair__dir_path }}/{{ ssh__create_keypair__name }}"
-ssh__create_config__host: "{{ ssh_host }}"
-ssh__create_config__host_name: "{{ hostname }}"
-ssh__create_config__user: "{{ username }}"
-ssh__create_config__port: "{{ ssh_port }}"
-ssh__create_config__accept_new: true
-ssh__create_config__add_root: true
-ssh__create_config__host_root: "{{ ssh_dropbear_root_host }}"
-
-############################################################################################################
-
-iso__create_debian_preseed__iso_name: "{{ debian_preseed_iso_name }}"
-iso__create_debian_preseed__scripts_dir_path: "{{ tmp_scripts_dir_path }}"
-iso__create_debian_preseed__iso_dir_path: "{{ tmp_iso_dir_path }}"
-iso__create_debian_preseed__debian_architecture: "{{ debian_architecture }}"
-iso__create_debian_preseed__debian_version: "{{ debian_version }}"
 iso__create_debian_preseed__sudo_without_password: true
-iso__create_debian_preseed__preseed_username: "{{ username }}"
-iso__create_debian_preseed__preseed_user_password: "{{ bitwarden__generate_password__result }}"
-iso__create_debian_preseed__preseed_dropbear_ssh_port: "{{ ssh_port }}"     
-iso__create_debian_preseed__preseed_user_password_crypted: "{{ bitwarden__generate_password__result }}"
 iso__create_debian_preseed__preseed_ip: "{{ debian_vm_ip }}"
 iso__create_debian_preseed__preseed_gateway_ip: "{{ debian_vm_dhcp_start_address }}"
 iso__create_debian_preseed__preseed_subnet_mask: "{{ debian_vm_dhcp_subnet_mask }}"
-iso__create_debian_preseed__encrypt_boot_drive: true
-iso__create_debian_preseed__encrypt_password: "{{ bitwarden__generate_password__result }}"
-iso__create_debian_preseed__ssh_pub_key_file_path: "{{ ssh__create_keypair__pub_file_path }}"
 
 ############################################################################################################
 
