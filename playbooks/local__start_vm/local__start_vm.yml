@@ -1,0 +1,11 @@
+---
+- name: Start test vm
+  hosts: localhost
+  vars_files:
+    - "{{ inventory_dir }}/defaults/server.yml"
+    - "vars/test_vm.yml"
+  roles:
+    - role: bitwarden/bitwarden__get_field
+      delegate_to: localhost
+    - role: vm/vm__start_debian
+      delegate_to: localhost

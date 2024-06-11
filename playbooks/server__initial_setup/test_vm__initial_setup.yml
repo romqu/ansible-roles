@@ -5,6 +5,10 @@
     PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
   vars:
   # ansible_python_interpreter: "/Users/roman/projects/personal/ansible-server-config/venv/bin/python"
+  vars_files:
+    - "{{ inventory_dir }}/defaults/server.yml"
+    - "vars/main.yml"
+    - "vars/test_vm.yml"
   tasks:
     # - name: All sudo without pw
     #   become: true

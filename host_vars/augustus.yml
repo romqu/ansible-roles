@@ -94,7 +94,6 @@ zfs__create_dataset__data_list:
 
 ############################################################################
 
-backup__create_dirs__owner: 
 backup__create_dirs__convert_from_zfs_dataset_input: >-
   {{ 
     zfs__create_dataset__data_list |

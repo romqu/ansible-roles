@@ -9,7 +9,7 @@
   vars_files:
     - "{{ inventory_dir }}/defaults/server.yml"
     - "vars/main.yml"
-    - "vars/test_vml.yml"
+    - "vars/test_vm.yml"
 
   roles:
     - role: bitwarden/bitwarden__create_folder

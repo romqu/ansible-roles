@@ -1,0 +1,4 @@
+iso__create_debian_preseed__sudo_without_password: false
+iso__create_debian_preseed__preseed_ip: "{{ ip }}"
+iso__create_debian_preseed__preseed_gateway_ip: "{{ gateway_ip }}"
+iso__create_debian_preseed__preseed_subnet_mask: "{{ subnet_mask }}"

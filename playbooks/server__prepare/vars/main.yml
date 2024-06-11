@@ -26,7 +26,7 @@ ssh__create_keypair__dir_path: "~/.ssh/ansible_keys"
 ssh__create_config__file_name: "{{ ssh__create_keypair__name }}_config"
 ssh__create_config__identity_file_path: "{{ ssh__create_keypair__dir_path }}/{{ ssh__create_keypair__name }}"
 ssh__create_config__host: "{{ ssh_host }}"
-ssh__create_config__host_name: "{{ hostname }}.{{ domain }}"
+ssh__create_config__host_name: "{{ hostname }}"
 ssh__create_config__user: "{{ username }}"
 ssh__create_config__port: "{{ ssh_port }}"
 ssh__create_config__accept_new: true

@@ -6,6 +6,7 @@ debian_vm_image_name: "debian"
 debian_vm_image_format: "qcow2"
 debian_vm_image_file: "{{ debian_vm_image_name }}.{{ debian_vm_image_format }}"
 debian_vm_tmp_image_file_path: "{{ tmp_files_dir_path }}/{{ debian_vm_image_file }}"
+debian_vm_encrypt_boot_drive: true
 
 debian_vm_hdd_image_quantity: 2
 debian_vm_hdd_image_name: "debian_hdd"
@@ -23,13 +24,9 @@ debian_vm_dhcp_end_address: "10.0.2.3"
 debian_vm_dhcp_subnet_mask: "255.255.255.0"
 debian_vm_net: "10.0.2.0/24"
 
-
 debian_vm_initrd_img_file_path: "{{ tmp_files_dir_path }}/{{ debian_vm_initrd_img_name }}"
 debian_vm_kernel_img_file_path: "{{ tmp_files_dir_path }}/{{ debian_vm_kernel_img_name }}"
 
 qemu_monitor_socket_path: "/tmp/qemu_monitor.socket"
-
-debian_vm__ssh_dropbear_root_password: "" # set in playbook
-debian_vm__crypt_password: "" # set in playbook
 
 domain: "stage.schaunis.at"
