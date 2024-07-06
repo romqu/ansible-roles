@@ -1,0 +1,11 @@
+bitwarden_get_field__data_dict_list:
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__server_password"
+    bitwarden__get_field__entry_name: "{{ bitwarden_item_name }}"
+    bitwarden__get_field__field_name: "password"
+
+############################################################################
+
+system__unlock_encrypted__hostname: "{{ hostname }}"
+system__unlock_encrypted__crypt_password: "{{ bitwarden__get_field__server_password }}"
+system__unlock_encrypted__ssh_dropbear_root_host: "{{ ssh_dropbear_root_host }}"
+system__unlock_encrypted__ssh_dropbear_root_password: "{{ bitwarden__get_field__server_password }}"

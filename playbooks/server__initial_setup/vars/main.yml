@@ -216,6 +216,7 @@ backblaze_b2__main_bucket: "{{ backblaze_b2__setup_buckets__result[0] }}"
 
 ############################################################################
 
+restic__docker_setup__hostname: "{{ hostname }}"
 restic__docker_setup__dir_path: "{{ docker__base_dir_path }}/restic"
 restic__docker_setup__aws_access_key_id: >-
   {{
@@ -314,7 +315,6 @@ immich__docker_setup__external_network_name: >-
 
 caddy__add_site__container_name: "{{ caddy__docker_setup__container_name }}"
 caddy__add_site__sub_configs_dir_path: "{{ caddy__docker_setup__sub_configs_dir_path }}"
-
 caddy__add_site__site_list:
   - file_name: "immich.conf"
     tls_enabled: true

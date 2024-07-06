@@ -1,0 +1,1 @@
+caddy__docker_setup__acme_ca_url: "https://acme-v02.api.letsencrypt.org/directory"
