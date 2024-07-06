@@ -8,4 +8,4 @@ bitwarden_get_field__data_dict_list:
 system__unlock_encrypted__hostname: "{{ hostname }}"
 system__unlock_encrypted__crypt_password: "{{ bitwarden__get_field__server_password }}"
 system__unlock_encrypted__ssh_dropbear_root_host: "{{ ssh_dropbear_root_host }}"
-system__unlock_encrypted__ssh_dropbear_root_password: "{{ bitwarden__get_field__server_password }}"
+system__unlock_encrypted__ssh_dropbear_root_password: "{{ bitwarden__get_field__server_password }
