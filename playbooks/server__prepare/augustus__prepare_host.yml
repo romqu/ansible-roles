@@ -1,7 +1,7 @@
 ---
 # ansible-playbook -i staging.yml --ask-become-pass playbooks/test_vm__setup.yml
 - name: Setup host
-  hosts: localhost
+  hosts: localhost_prod
   environment:
     # PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
   vars:
