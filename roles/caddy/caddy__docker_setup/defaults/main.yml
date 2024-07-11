@@ -1,5 +1,3 @@
-caddy__docker_setup__version: "2.7.6"
-
 caddy__docker_setup__container_name: "caddy"
 
 caddy__docker_setup__external_network_name: "caddy-external-network"
