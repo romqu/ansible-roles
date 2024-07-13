@@ -11,6 +11,11 @@
             "matchManagers": [
                 "pip_requirements"
             ],
+            "matchUpdateTypes": [
+                "minor",
+                "patch",
+                "major"
+            ],
             "groupName": "Python dependencies",
             "enabled": true
         }
