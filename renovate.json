@@ -21,6 +21,11 @@
             ],
             "groupName": "Python dependencies",
             "enabled": true
+        },
+        {
+            "matchPackagePatterns": ["redis"],
+            "matchManagers": ["docker-compose"],
+            "enabled": false
         }
     ],
     "regexManagers": [

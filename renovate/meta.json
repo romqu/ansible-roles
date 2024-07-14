@@ -9,6 +9,24 @@
                 "docker"
             ],
             "sourceUrl": "https://github.com/tailscale/tailscale"
+        },
+        {
+            "matchDepPatterns": [
+                "restic"
+            ],
+            "matchDatasources": [
+                "docker"
+            ],
+            "sourceUrl": "https://github.com/restic/restic"
+        },
+        {
+            "matchDepPatterns": [
+                "caddy"
+            ],
+            "matchDatasources": [
+                "docker"
+            ],
+            "sourceUrl": "https://github.com/caddyserver/caddy"
         }
     ]
 }
