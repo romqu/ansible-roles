@@ -3,6 +3,11 @@
     "extends": [
         "config:recommended"
     ],
+    "docker-compose": {
+        "fileMatch": [
+            "^compose\\.ya?ml(?:\\.j2)?$"
+        ]
+    },
     "packageRules": [
         {
             "matchDatasources": [
