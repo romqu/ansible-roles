@@ -1,0 +1,14 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "packageRules": [
+        {
+            "matchDepPatterns": [
+                "immich"
+            ],
+            "matchDatasources": [
+                "docker"
+            ],
+            "sourceUrl": "https://github.com/rook/rook"
+        }
+    ]
+}
