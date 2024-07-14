@@ -3,7 +3,7 @@
     "extends": [
         "config:recommended"
     ],
-    "docker": {
+    "docker-compose": {
         "fileMatch": [
             "^compose\\.ya?ml(?:\\.j2)?$"
         ]
@@ -23,6 +23,16 @@
             ],
             "groupName": "Python dependencies",
             "enabled": true
+        }
+    ],
+    "regexManagers": [
+        {
+            "fileMatch": "(^|/)(?:docker-)?compose[^/]*\\.ya?ml\\.j2$",
+            "matchStrings": [
+                "(?:image: )(?<depName>.*?)(?::(?<currentValue>.*?))?(?:@(?<currentDigest>sha256:[a-f0-9]+))?\\n"
+            ],
+            "datasourceTemplate": "docker",
+            "versioningTemplate": "docker"
         }
     ]
 }
