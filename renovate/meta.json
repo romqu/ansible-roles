@@ -3,12 +3,12 @@
     "packageRules": [
         {
             "matchDepPatterns": [
-                "immich"
+                "tailscale"
             ],
             "matchDatasources": [
                 "docker"
             ],
-            "sourceUrl": "https://github.com/rook/rook"
+            "sourceUrl": "https://github.com/tailscale/tailscale"
         }
     ]
 }
