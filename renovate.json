@@ -3,7 +3,7 @@
     "extends": [
         "config:recommended"
     ],
-    "docker-compose": {
+    "docker": {
         "fileMatch": [
             "^compose\\.ya?ml(?:\\.j2)?$"
         ]
