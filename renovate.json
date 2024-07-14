@@ -3,7 +3,8 @@
     "extends": [
         "config:recommended",
         ":disableRateLimiting",
-        "docker:enableMajor"
+        "docker:enableMajor",
+        "docker:pinDigests"
     ],
     "packageRules": [
         {
