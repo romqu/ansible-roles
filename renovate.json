@@ -3,7 +3,8 @@
     "extends": [
         "config:recommended",
         ":disableRateLimiting",
-        "docker:enableMajor"
+        "docker:enableMajor",
+        "github>romqu/ansible-roles//renovate/meta.json"
     ],
     "packageRules": [
         {
