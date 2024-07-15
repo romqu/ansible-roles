@@ -23,8 +23,12 @@
             "enabled": true
         },
         {
-            "matchPackageNames": ["redis"],
-            "matchManagers": ["docker-compose"],
+            "matchPackagePatterns": [
+                "redis"
+            ],
+            "matchManagers": [
+                "docker-compose"
+            ],
             "enabled": false
         }
     ],
