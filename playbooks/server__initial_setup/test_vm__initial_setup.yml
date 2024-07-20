@@ -10,19 +10,19 @@
     - "vars/main.yml"
     - "vars/test_vm.yml"
   tasks:
-    # - name: All sudo without pw
-    #   become: true
-    #   community.general.sudoers:
-    #     name: all-sudo
-    #     user: roman
-    #     commands: ALL
-    #     nopassword: true
+    - name: All sudo without pw
+      become: true
+      community.general.sudoers:
+        name: all-sudo
+        user: roman
+        commands: ALL
+        nopassword: true
 
-    # - name: Install foot-terminfo
-    #   become: true
-    #   ansible.builtin.apt:
-    #     name: foot-terminfo
-    #     state: present
+    - name: Install foot-terminfo
+      become: true
+      ansible.builtin.apt:
+        name: foot-terminfo
+        state: present
 
   roles:
     - role: sshd__setup_config

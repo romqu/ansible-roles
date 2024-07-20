@@ -27,6 +27,16 @@
                 "docker"
             ],
             "sourceUrl": "https://github.com/caddyserver/caddy"
+        },
+        {
+            "matchDepPatterns": [
+                "immich"
+            ],
+            "matchDatasources": [
+                "docker"
+            ],
+            "sourceUrl": "https://github.com/immich-app/immich/"
         }
     ]
 }
+

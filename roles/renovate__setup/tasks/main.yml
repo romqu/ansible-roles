@@ -1,0 +1,16 @@
+---
+- name: Make sure dirs exists
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ renovate__docker_setup__dir_path }}"
+
+- name: Copy templates
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ renovate__docker_setup__dir_path }}/{{ file_name }}"
+  with_fileglob:
+    - "templates/*.j2"
+  vars:
+    file_name: "{{ item | basename | regex_replace('\\.j2$', '') }}"
