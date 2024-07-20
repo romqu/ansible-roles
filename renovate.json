@@ -6,14 +6,6 @@
         "docker:enableMajor",
         "github>romqu/ansible-roles//renovate/meta.json"
     ],
-    "hostRules": [
-        {
-            "hostType": "docker",
-            "matchHost": "ghcr.io",
-            "username": "romqu",
-            "password": "{{ secrets.GITHUB_PASSWORD }}"
-        }
-    ],
     "packageRules": [
         {
             "matchDatasources": [
