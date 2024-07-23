@@ -30,6 +30,12 @@
                 "docker-compose"
             ],
             "enabled": false
+        },
+        {
+            "matchPackagePatterns": [
+                "immich"
+            ],
+            "groupName": "immich"
         }
     ],
     "regexManagers": [
