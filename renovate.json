@@ -6,6 +6,8 @@
         "docker:enableMajor",
         "github>romqu/ansible-roles//renovate/meta.json"
     ],
+    "osvVulnerabilityAlerts": true,
+    "dependencyDashboardOSVVulnerabilitySummary": "all",
     "packageRules": [
         {
             "matchDatasources": [
