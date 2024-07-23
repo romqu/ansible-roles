@@ -8,6 +8,7 @@
     ],
     "osvVulnerabilityAlerts": true,
     "dependencyDashboardOSVVulnerabilitySummary": "all",
+    "ignoreDeps": ["redis"],
     "packageRules": [
         {
             "matchDatasources": [
@@ -23,15 +24,6 @@
             ],
             "groupName": "Python dependencies",
             "enabled": true
-        },
-        {
-            "matchPackagePatterns": [
-                "redis"
-            ],
-            "matchManagers": [
-                "docker-compose"
-            ],
-            "enabled": false
         },
         {
             "matchPackagePatterns": [
