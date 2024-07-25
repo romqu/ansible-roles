@@ -1,0 +1,3 @@
+zfs__create_pool__pool_name: "zdata"
+zfs__create_pool__mount_path: "/mnt/{{ zfs__create_pool__pool_name }}"
+zfs__pool__dataset_name: "zbackup"

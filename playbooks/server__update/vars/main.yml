@@ -1,0 +1,105 @@
+############################################################################
+
+ansible_become_pass: "{{ bitwarden__get_password__result }}"
+
+############################################################################
+
+backup__source_dir_path: "TODO"
+
+############################################################################
+
+backblaze_b2__bucket_name__main: "{{ ansible_hostname }}-main-{{ host_uuid }}"
+backblaze_b2__bucket_name__replication: "{{ ansible_hostname }}-replication-{{ host_uuid }}"
+
+############################################################################
+
+bitwarden_get_field__data_dict_list:
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_eu_master_key"
+    bitwarden__get_field__entry_name: "backblaze-eu"
+    bitwarden__get_field__field_name: "masterApplicationKey"
+
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_eu_master_key_id"
+    bitwarden__get_field__entry_name: "backblaze-eu"
+    bitwarden__get_field__field_name: "masterKeyId"
+
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_us_west_master_key"
+    bitwarden__get_field__entry_name: "backblaze-us-west"
+    bitwarden__get_field__field_name: "masterApplicationKey"
+
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_us_west_master_key_id"
+    bitwarden__get_field__entry_name: "backblaze-us-west"
+    bitwarden__get_field__field_name: "masterKeyId"
+
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_main_key_id"
+    bitwarden__get_field__entry_name: "{{ backblaze_b2__bucket_name__main }}"
+    bitwarden__get_field__field_name: "username"
+
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_main_key"
+    bitwarden__get_field__entry_name: "{{ backblaze_b2__bucket_name__main }}"
+    bitwarden__get_field__field_name: "password"
+
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_replication_key_id"
+    bitwarden__get_field__entry_name: "{{ backblaze_b2__bucket_name__replication }}"
+    bitwarden__get_field__field_name: "username"
+
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__b2_replication_key"
+    bitwarden__get_field__entry_name: "{{ backblaze_b2__bucket_name__replication }}"
+    bitwarden__get_field__field_name: "password"
+
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__pushover_user_key"
+    bitwarden__get_field__entry_name: "pushover_user_key"
+    bitwarden__get_field__field_name: "password"
+
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__pushover_restic_backup_app_token"
+    bitwarden__get_field__entry_name: "pushover_restic_backup_app_token"
+    bitwarden__get_field__field_name: "password"
+
+  - bitwarden__get_field__fact_name: "bitwarden__get_field__hetzner_api_token"
+    bitwarden__get_field__entry_name: "hetzner_api_token"
+    bitwarden__get_field__field_name: "password"
+
+############################################################################
+
+docker__base_dir_path: "{{ ansible_env.HOME }}/docker"
+
+############################################################################
+
+restic__docker_setup__hostname: "{{ hostname }}"
+restic__docker_setup__dir_path: "{{ docker__base_dir_path }}/restic"
+restic__docker_setup__aws_access_key_id: >-
+  {{
+    bitwarden__get_field__b2_main_key_id
+  }}
+restic__docker_setup__aws_secret_access_key: >-
+  {{
+    bitwarden__get_field__b2_main_key
+  }}
+restic__docker_setup__restic_password: "{{ bitwarden__get_password__result }}"
+restic__docker_setup__pushover_user_key: "{{ bitwarden__get_field__pushover_user_key }}"
+restic__docker_setup__pushover_app_token: >-
+  {{ bitwarden__get_field__pushover_restic_backup_app_token }}
+restic__docker_setup__backup_source_dir_path_host: "{{ backup__source_dir_path }}"
+restic__docker_setup__backup_source_dir_path_container: "/data"
+restic__docker_setup__repo_remote_dict:
+  - repo: >-
+      s3:s3.eu-central-003.backblazeb2.com/{{ backblaze_b2__bucket_name__main }}
+    forget_args: >-
+      --keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75
+restic__docker_setup__repo_local_dict: >-
+  {{
+    (
+      (backup__create_dirs__convert_from_fstab_output | default([])) +
+      (backup__create_dirs__convert_from_ext4_partitions_output | default([]))
+    ) |
+    ansible.utils.replace_keys(target=[
+      {
+        'before':'backup_dir_path',
+        'after':'repo'
+      }
+    ]) |
+    map('combine',
+      {
+        'forget_args': '--keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-yearly 75'
+      }
+     )
+  }}

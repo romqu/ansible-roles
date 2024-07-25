@@ -1,0 +1,18 @@
+---
+- name: Setup test vm
+  hosts: test_vm_01
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+  vars:
+  # ansible_python_interpreter: "/Users/roman/projects/personal/ansible-server-config/venv/bin/python"
+  vars_files:
+    - "{{ inventory_dir }}/defaults/server.yml"
+    - "vars/main.yml"
+    - "vars/test_vm.yml"
+
+  roles:
+    - role: hdd/hdd__get_all
+    - role: bitwarden/bitwarden__get_field
+    - role: backblaze_b2__setup_buckets
+    - role: bitwarden__convert_backblaze_b2
+    - role: restic__docker_setup
