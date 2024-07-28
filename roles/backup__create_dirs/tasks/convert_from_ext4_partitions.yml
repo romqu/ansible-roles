@@ -11,11 +11,11 @@
       loop: "{{ backup__create_dirs__convert_from_ext4_partitions_input }}"
       vars:
         root_dir_path: "{{ item.mount_dir_path }}"
-        backup_dir_name: "backup"
-        backup_dir_path: "{{ root_dir_path }}/{{ backup_dir_name }}"
+        backup_dir_path: >-
+          {{ root_dir_path }}/{{ backup__create_dirs__backup_dir_name }}
         append:
           - root_dir_path: "{{ root_dir_path }}"
-            backup_dir_name: "{{ backup_dir_name }}"
+            backup_dir_name: "{{ backup__create_dirs__backup_dir_name }}"
             backup_dir_path: "{{ backup_dir_path }}"
             backup_dir_owner: "{{ item.backup_dir_owner }}"
 

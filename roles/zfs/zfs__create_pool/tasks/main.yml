@@ -1,4 +1,4 @@
-- name: Create mirror for '{{ zfs__create_pool__disk_path_list }}'
+- name: Create two way mirror for '{{ zfs__create_pool__disk_path_list }}'
   become: true
   ansible.builtin.command: >-
     zpool create {{ zfs__create_pool__pool_name }} \
@@ -7,10 +7,31 @@
     -O compression=lz4 \
     -O atime=off \
     -O mountpoint={{ zfs__create_pool__mount_path }} \
-    mirror {{ disk_paths }}
+    mirror {{ disk_path_joined }}
   when:
     - zfs__create_pool__type == "mirror"
     - zfs__create_pool__disk_path_list is iterable
-    - (zfs__create_pool__disk_path_list | length) > 1
+    - (zfs__create_pool__disk_path_list | length) == 2
   vars:
-    disk_paths: "{{ zfs__create_pool__disk_path_list | join(' ') }}"
+    disk_path_joined: "{{ zfs__create_pool__disk_path_list | join(' ') }}"
+
+- name: Create striped two way mirror for '{{ zfs__create_pool__disk_path_list }}'
+  become: true
+  ansible.builtin.command: >-
+    zpool create {{ zfs__create_pool__pool_name }} \
+    -o ashift=12 \
+    -O normalization=formD \
+    -O compression=lz4 \
+    -O atime=off \
+    -O mountpoint={{ zfs__create_pool__mount_path }} \
+    mirror {{ disk_path_first_mirror_joined }} \
+    mirror {{ disk_path_second_mirror_joined }}
+  when:
+    - zfs__create_pool__type == "mirror"
+    - zfs__create_pool__disk_path_list is iterable
+    - (zfs__create_pool__disk_path_list | length) == 4
+  vars:
+    disk_path_first_mirror_list: "{{ zfs__create_pool__disk_path_list[0:2] }}"
+    disk_path_second_mirror_list: "{{ zfs__create_pool__disk_path_list[2:4] }}"
+    disk_path_first_mirror_joined: "{{ disk_path_first_mirror_list | join(' ') }}"
+    disk_path_second_mirror_joined: "{{ disk_path_second_mirror_list | join(' ') }}"

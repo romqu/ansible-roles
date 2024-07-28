@@ -94,6 +94,7 @@ zfs__create_dataset__data_list:
 
 ############################################################################
 
+backup__create_dirs__backup_dir_name: "{{ backup__dir_name }}"
 backup__create_dirs__convert_from_zfs_dataset_input: >-
   {{ 
     zfs__create_dataset__data_list |
