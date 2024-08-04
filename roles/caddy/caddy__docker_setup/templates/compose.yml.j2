@@ -37,7 +37,7 @@ services:
   # default: daily
   backup:
     container_name: caddy-data-backup
-    image: offen/docker-volume-backup:v2.39.1
+    image: offen/docker-volume-backup:v2.40.0
     restart: always
     environment:
       BACKUP_FILENAME: backup-caddy-data-%Y-%m-%dT%H-%M-%S.tar.gz
